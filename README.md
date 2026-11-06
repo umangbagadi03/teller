@@ -21,3 +21,16 @@ customer message -> retrieve -> think -> check -> reply or bank tool call
 
 Search is hybrid: BM25 and local embeddings are combined with Reciprocal Rank Fusion, then a local cross-encoder reranks the top results. Indexing and search need no API key.
 
+## Setup
+
+Needs Python 3.12 or 3.13.
+
+```bash
+bash setup.sh
+.venv/bin/python main.py index
+```
+
+Add one key to `.env`. Teller picks the provider from the key it finds, in this order: Gemini, Anthropic, OpenAI. With no key it uses a local Ollama model. Set `LLM_PROVIDER` to force one.
+
+Gemini has a free tier. If you hit its rate limit, set `LLM_PAUSE_SECONDS=4` in `.env`.
+
