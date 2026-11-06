@@ -90,3 +90,10 @@ tests/                   unit tests, no LLM calls
 - **Documents go in the system prompt, once.** They are not repeated in the message history. The newest 20 are kept, and a document found again moves back to the newest place. A quarter of the tasks need more than 12 documents.
 - **Limits are hard limits.** At three searches in a step the search tool is removed, so the agent cannot loop on it. The step limit is 200, the benchmark's default.
 
+## Limitations
+
+- The bank, customers and tasks are synthetic, so scores say nothing about real customers.
+- The verification check confirms that verification was logged. It does not compare the customer's answers itself, which is still the LLM's job.
+- The benchmark's tasks are public. Only a holdout score should be reported, and it is not a leaderboard submission unless the submission guide is followed.
+- The retrieval comparison uses the customer's request from each scenario as the query, so it compares methods but is not the agent's real recall.
+- Failure labels are a rough first guess, based on the documents found and how the run ended. Read the conversation to confirm the cause.
