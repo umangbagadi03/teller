@@ -81,3 +81,12 @@ web/                     plain HTML, CSS and JavaScript
 tests/                   unit tests, no LLM calls
 ```
 
+## Design decisions
+
+- **No vector database.** 698 short documents fit in one NumPy file, and a full scan takes milliseconds. A database server would add setup without changing results.
+- **LiteLLM for all providers.** The benchmark already depends on it, so the agent and the simulated customer call every provider the same way.
+- **Verification is enforced in code.** Hidden account tools and email changes are blocked until verification is logged, except emergency transfers, which the policy allows first. A test replays every reference solution through the rules, and none is blocked.
+- **Automatic search runs only on the opening message.** Follow-ups like "yes please" found unrelated documents and pushed useful ones out of the prompt. After the first message, the LLM writes its own searches.
+- **Documents go in the system prompt, once.** They are not repeated in the message history. The newest 20 are kept, and a document found again moves back to the newest place. A quarter of the tasks need more than 12 documents.
+- **Limits are hard limits.** At three searches in a step the search tool is removed, so the agent cannot loop on it. The step limit is 200, the benchmark's default.
+
