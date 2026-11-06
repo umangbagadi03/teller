@@ -42,3 +42,26 @@ Gemini has a free tier. If you hit its rate limit, set `LLM_PAUSE_SECONDS=4` in 
 
 Open http://127.0.0.1:8010. On the Branch desk you play the customer, and the customer file on the left has the details you need to pass verification. The working record on the right shows every search, blocked call and bank action. Each case gets its own copy of the sample database. The web app shows Indian sample customers through a separate demo copy, while the benchmark keeps its original database so scores stay comparable.
 
+## Evaluation
+
+Compare search methods. This runs locally and has no API cost:
+
+```bash
+.venv/bin/python main.py retrieval
+```
+
+Run benchmark tasks:
+
+```bash
+.venv/bin/python main.py benchmark --pipeline teller --limit 5
+.venv/bin/python main.py benchmark --pipeline bm25 --limit 5
+```
+
+Use `--limit 0` for every task in the split. Each task uses LLM calls for both the agent and the simulated customer, so start small.
+
+20 tasks are kept aside as a holdout set. Tune on `development`, and run `--split holdout` only for the final score.
+
+```bash
+.venv/bin/python -m pytest tests
+```
+
