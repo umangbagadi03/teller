@@ -65,3 +65,19 @@ Use `--limit 0` for every task in the split. Each task uses LLM calls for both t
 .venv/bin/python -m pytest tests
 ```
 
+## Project layout
+
+```
+main.py                  commands
+teller/
+  config.py              paths and settings
+  llm/provider.py        picks the provider and model from .env
+  knowledge/             BM25, embeddings, reranker, hybrid search
+  agent/                 LangGraph agent: state, prompts, nodes, rules, graph
+  bank/                  a customer case in the web app
+  benchmark/             pipelines, runner, task split, retrieval eval, reports
+  api/                   FastAPI routes
+web/                     plain HTML, CSS and JavaScript
+tests/                   unit tests, no LLM calls
+```
+
