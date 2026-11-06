@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Teller | Support console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/desk.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="brand-mark">T</span>Teller</a>
+    <nav class="nav">
+      <a class="nav-link nav-link-active" href="index.html">Console</a>
+      <a class="nav-link" href="results.html">Results</a>
+    </nav>
+    <p class="model-chip" id="model-line">Checking model</p>
+  </header>
+
+  <main class="console">
+    <aside class="customers">
+      <div class="customers-head">
+        <h2>Customers</h2>
+        <span class="count" id="customer-count"></span>
+      </div>
+      <input class="customer-search" id="customer-search" type="search" placeholder="Search by name" aria-label="Search customers">
+      <ul class="customer-list" id="customer-list"></ul>
+    </aside>
+
+    <section class="conversation">
+      <div class="conversation-head">
+        <span class="avatar avatar-large" id="current-avatar"></span>
+        <div class="conversation-title">
+          <h1 id="current-name">Loading</h1>
+          <p>Case <span id="case-number">not opened</span></p>
+        </div>
+        <button class="secondary-button" id="new-case-button" type="button">New case</button>
+      </div>
+
+      <div class="messages" id="messages">
+        <div class="welcome" id="welcome">
+          <h2>Speak as the customer</h2>
+          <p>Teller searches bank policy, checks the account and takes the action. Everything runs on a private copy of the sample database.</p>
+          <div class="suggestions" id="suggestions"></div>
+        </div>
+      </div>
+
+      <form class="composer" id="message-form">
+        <input id="message-input" type="text" autocomplete="off" placeholder="Write as the customer" aria-label="Customer message">
+        <button class="send-button" id="send-button" type="submit">Send</button>
+      </form>
+      <p class="form-error" id="form-error"></p>
+    </section>
+
+    <aside class="details">
+      <div class="tabs" role="tablist">
+        <button class="tab tab-active" id="activity-tab" type="button" role="tab">Activity</button>
+        <button class="tab" id="profile-tab" type="button" role="tab">Customer file</button>
+      </div>
+
+      <div id="activity-panel">
+        <dl class="case-stats">
+          <div><dt>Documents</dt><dd id="stat-documents">0</dd></div>
+          <div><dt>Actions</dt><dd id="stat-actions">0</dd></div>
+          <div><dt>LLM cost</dt><dd id="stat-cost">$0.00</dd></div>
+        </dl>
+        <p class="activity-empty" id="activity-empty">Searches, blocked calls and bank actions appear here as the case runs.</p>
+        <ol class="timeline" id="timeline"></ol>
+      </div>
+
+      <div id="profile-panel" hidden>
+        <p class="profile-note">Give any two of these when Teller asks you to verify. All of it is sample data.</p>
+        <dl class="profile" id="profile"></dl>
+      </div>
+    </aside>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/desk.js"></script>
+</body>
+</html>
