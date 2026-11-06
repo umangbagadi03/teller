@@ -34,3 +34,11 @@ Add one key to `.env`. Teller picks the provider from the key it finds, in this 
 
 Gemini has a free tier. If you hit its rate limit, set `LLM_PAUSE_SECONDS=4` in `.env`.
 
+## Web app
+
+```bash
+.venv/bin/python main.py serve
+```
+
+Open http://127.0.0.1:8010. On the Branch desk you play the customer, and the customer file on the left has the details you need to pass verification. The working record on the right shows every search, blocked call and bank action. Each case gets its own copy of the sample database. The web app shows Indian sample customers through a separate demo copy, while the benchmark keeps its original database so scores stay comparable.
+
