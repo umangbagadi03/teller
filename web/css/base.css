@@ -1,0 +1,143 @@
+:root {
+  --navy: #101c2e;
+  --background: #eef1f5;
+  --surface: #ffffff;
+  --surface-soft: #f6f8fa;
+  --line: #dde2ea;
+  --text: #162033;
+  --muted: #5f6b7d;
+  --brand: #0a7c66;
+  --brand-dark: #075e4d;
+  --brand-soft: #e2f3ef;
+  --blue: #2257d6;
+  --blue-soft: #e6edfc;
+  --red: #b92f1c;
+  --red-soft: #fbe9e6;
+  --font: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --mono: "Geist Mono", Menlo, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3,
+p,
+dl,
+dd,
+ol,
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  height: 56px;
+  padding: 0 20px;
+  background: var(--navy);
+  color: #ffffff;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: #36c9a7;
+  color: var(--navy);
+  font-size: 15px;
+  place-items: center;
+}
+
+.nav {
+  display: flex;
+  align-self: stretch;
+  gap: 4px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border-bottom: 2px solid transparent;
+  color: #b9c3d2;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.nav-link:hover {
+  color: #ffffff;
+}
+
+.nav-link-active {
+  border-bottom-color: #36c9a7;
+  color: #ffffff;
+}
+
+.model-chip {
+  margin-left: auto;
+  padding: 3px 10px;
+  border: 1px solid #33425a;
+  border-radius: 6px;
+  color: #cfd7e3;
+  font-family: var(--mono);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    flex-wrap: wrap;
+    gap: 2px 14px;
+    height: auto;
+    padding: 8px 16px;
+  }
+
+  .nav {
+    min-height: 34px;
+  }
+
+  .model-chip {
+    width: 100%;
+    margin: 4px 0;
+  }
+}
