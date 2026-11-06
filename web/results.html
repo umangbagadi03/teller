@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Teller | Results</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/results.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="brand-mark">T</span>Teller</a>
+    <nav class="nav">
+      <a class="nav-link" href="index.html">Console</a>
+      <a class="nav-link nav-link-active" href="results.html">Results</a>
+    </nav>
+    <p class="model-chip" id="model-line">Checking model</p>
+  </header>
+
+  <main class="page">
+    <div class="page-head">
+      <h1>Evaluation results</h1>
+      <p>Tasks come from the banking_knowledge domain of τ-Bench. A task passes when the bank database ends in the correct state.</p>
+    </div>
+
+    <section class="tiles">
+      <div class="tile">
+        <p class="tile-label">Teller task success</p>
+        <p class="tile-value" id="tile-teller">Not run</p>
+        <p class="tile-note" id="tile-teller-note">Latest Teller run</p>
+      </div>
+      <div class="tile">
+        <p class="tile-label">Plain RAG task success</p>
+        <p class="tile-value" id="tile-baseline">Not run</p>
+        <p class="tile-note" id="tile-baseline-note">Latest BM25 baseline run</p>
+      </div>
+      <div class="tile">
+        <p class="tile-label">Cost per Teller task</p>
+        <p class="tile-value" id="tile-cost">Not run</p>
+        <p class="tile-note">Agent and simulated customer</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Task success by pipeline</h2>
+      <p class="panel-note">The latest run of each pipeline. Compare bars only when the model and split match.</p>
+      <div class="bars" id="pipeline-bars"></div>
+      <p class="empty" id="pipeline-empty">No runs yet. Start with: python main.py benchmark --limit 5</p>
+    </section>
+
+    <section class="panel">
+      <h2>All runs</h2>
+      <div class="table-frame">
+        <table>
+          <thead>
+            <tr>
+              <th>Pipeline</th>
+              <th>Split</th>
+              <th>Model</th>
+              <th class="number">Tasks</th>
+              <th class="number">Success</th>
+              <th class="number">Docs found</th>
+              <th class="number">Cost / task</th>
+              <th class="number">Sec / task</th>
+            </tr>
+          </thead>
+          <tbody id="run-rows"></tbody>
+        </table>
+      </div>
+      <p class="empty" id="runs-empty">Runs appear here after the first benchmark command.</p>
+    </section>
+
+    <section class="panel" id="run-detail" hidden>
+      <h2>Tasks in <span class="run-name" id="run-name"></span></h2>
+      <div class="table-frame">
+        <table>
+          <thead>
+            <tr>
+              <th>Task</th>
+              <th>Outcome</th>
+              <th>Ended by</th>
+              <th class="number">Docs found</th>
+              <th class="number">Messages</th>
+              <th class="number">Seconds</th>
+            </tr>
+          </thead>
+          <tbody id="task-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Search methods, recall at 10</h2>
+      <p class="panel-note">Runs on local models with no API cost. It uses the customer's request from each scenario as the query, so it compares methods but is not the agent's real recall.</p>
+      <div class="bars" id="retrieval-bars"></div>
+      <div class="table-frame" id="retrieval-table" hidden>
+        <table>
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th class="number">Recall at 5</th>
+              <th class="number">Recall at 10</th>
+              <th class="number">Recall at 20</th>
+              <th class="number">Exact tool name found</th>
+            </tr>
+          </thead>
+          <tbody id="retrieval-rows"></tbody>
+        </table>
+      </div>
+      <p class="empty" id="retrieval-empty">Not measured yet. Run: python main.py retrieval</p>
+    </section>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/results.js"></script>
+</body>
+</html>
