@@ -1,0 +1,11 @@
+.env
+.venv/
+vendor/
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+.claude/
+data/index/
+data/simulations/
+notes/
