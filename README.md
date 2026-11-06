@@ -21,6 +21,36 @@ customer message -> retrieve -> think -> check -> reply or bank tool call
 
 Search is hybrid: BM25 and local embeddings are combined with Reciprocal Rank Fusion, then a local cross-encoder reranks the top results. Indexing and search need no API key.
 
+## Results
+
+### Search methods
+
+Measured locally with no API cost. Recall uses the customer's request from 77 development tasks as the query. The tool name column searches for each of the 46 hidden tool names and checks the top 5 results.
+
+| Method | Recall at 5 | Recall at 10 | Recall at 20 | Exact tool name found |
+|---|---|---|---|---|
+| BM25 | 2.7% | 6.0% | 12.6% | 100% |
+| Embeddings | 12.7% | 17.0% | 25.3% | 95.7% |
+| Hybrid | 8.0% | 13.8% | 20.7% | 100% |
+| Hybrid + reranker | 9.7% | 16.1% | 20.7% | 97.8% |
+
+Tasks often need many documents and this test makes one search, so recall is low. Embeddings alone lead on recall, while BM25 is stronger on exact names. Teller uses hybrid with reranking as a balance between the two. This is a stand-in test, so the benchmark runs below should make the final call.
+
+### Task success
+
+No scored run has been recorded yet. Run the commands in the Evaluation section, and the Results page in the web app fills in by itself. A single task was run on an earlier version with a small local model to check the full flow. It did not finish within the step limit, so it is not a score.
+
+| Pipeline | What changes | Task success |
+|---|---|---|
+| `no_docs` | Benchmark's agent, no documents | not measured |
+| `bm25` | Benchmark's agent with a BM25 search tool | not measured |
+| `teller_no_checks` | Teller without the code checks | not measured |
+| `teller` | This project | not measured |
+| `teller_golden` | Teller, given the correct documents | not measured |
+| `golden` | Benchmark's agent, given the correct documents | not measured |
+
+These comparisons change one thing at a time. `teller` against `teller_no_checks` shows what the checks are worth. `teller` against `teller_golden` shows how much better search could still help. `bm25` against `teller` compares plain RAG with the whole design.
+
 ## Setup
 
 Needs Python 3.12 or 3.13.
