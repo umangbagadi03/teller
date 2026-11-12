@@ -49,15 +49,17 @@ class Case:
         return MultiToolMessage(role="tool", tool_messages=tool_messages), tool_events
 
     def send_message(self, text):
-        trace_size_before = len(self.state["trace"])
-        events = []
+        # Everything that happens for this message, in the order it happened
+        activity = []
         cost = 0.0
 
         message = UserMessage(role="user", content=text)
         reply = None
 
         for round_number in range(MAX_TOOL_ROUNDS):
+            trace_size_before = len(self.state["trace"])
             reply, self.state = self.agent.generate_next_message(message, self.state)
+            activity.extend(self.state["trace"][trace_size_before:])
             if reply.cost:
                 cost += reply.cost
 
@@ -65,17 +67,15 @@ class Case:
                 break
 
             message, tool_events = self.run_tool_calls(reply.tool_calls)
-            events.extend(tool_events)
+            activity.extend(tool_events)
 
         reply_text = "I could not finish this request. Please try again."
         if reply is not None and reply.content:
             reply_text = reply.content
 
-        new_trace = self.state["trace"][trace_size_before:]
         return {
             "reply": reply_text,
-            "steps": new_trace,
-            "actions": events,
+            "activity": activity,
             "cost": cost,
             "documents_found": len(self.state["documents"]),
         }

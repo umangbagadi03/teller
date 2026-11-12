@@ -264,11 +264,12 @@ async function handleSubmit(event) {
     const result = await postJson(path, { text: text });
 
     typingMessage.remove();
-    for (const step of result.steps) {
-      addStep(step);
-    }
-    for (const action of result.actions) {
-      addAction(action);
+    for (const item of result.activity) {
+      if (item.kind === "tool") {
+        addAction(item);
+      } else {
+        addStep(item);
+      }
     }
     addMessage("Teller", result.reply, "message-teller");
 
