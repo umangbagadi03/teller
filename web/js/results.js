@@ -69,9 +69,13 @@ function addBar(container, label, sublabel, value, tooltip) {
 }
 
 function getLatestRuns(runs) {
-  // The API lists the newest runs first, so the first one seen for a pipeline is the latest
+  // The API lists the newest runs first, so the first one seen for a pipeline is the latest.
+  // Runs that tried another search method stay in the table below, out of the chart.
   const latestRuns = {};
   for (const run of runs) {
+    if (!run.usual_search) {
+      continue;
+    }
     if (!latestRuns[run.pipeline]) {
       latestRuns[run.pipeline] = run;
     }
@@ -174,6 +178,17 @@ function showRetrieval(report) {
     addCell(row, formatPercent(item.recall_at_10), "number");
     addCell(row, formatPercent(item.recall_at_20), "number");
     addCell(row, formatPercent(item.tool_name_hit_rate), "number");
+    retrievalRows.append(row);
+  }
+
+  // A task can need more documents than one search returns, so this is the ceiling
+  if (report.best_possible) {
+    const row = makeElement("tr", "row-note");
+    addCell(row, "Best possible with one search");
+    addCell(row, formatPercent(report.best_possible.recall_at_5), "number");
+    addCell(row, formatPercent(report.best_possible.recall_at_10), "number");
+    addCell(row, formatPercent(report.best_possible.recall_at_20), "number");
+    addCell(row, "");
     retrievalRows.append(row);
   }
 }

@@ -147,6 +147,10 @@ tr:last-child td {
   border-bottom: 0;
 }
 
+.row-note td {
+  color: var(--muted);
+}
+
 .number {
   padding-right: 0;
   padding-left: 16px;
