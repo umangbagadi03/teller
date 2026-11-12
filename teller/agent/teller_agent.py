@@ -11,8 +11,14 @@ GRAPH_STEP_LIMIT = 40
 class TellerAgent(HalfDuplexAgent):
     def __init__(self, tools, domain_policy, llm=None, llm_args=None, use_checks=True):
         super().__init__(tools=tools, domain_policy=domain_policy)
-        self.llm = llm or get_model_name()
-        self.llm_args = llm_args or get_llm_settings()
+        # The benchmark passes its own model and settings. The web app passes none.
+        if llm is None:
+            llm = get_model_name()
+        if llm_args is None:
+            llm_args = get_llm_settings()
+
+        self.llm = llm
+        self.llm_args = llm_args
         self.use_checks = use_checks
         self.search_tool = get_search_tool()
         self.graph = build_graph(self)
@@ -71,11 +77,16 @@ class TellerAgent(HalfDuplexAgent):
         return reply, new_state
 
     def add_step_cost(self, reply, result):
+        # Adds the LLM calls hidden inside this step to the reply the benchmark sees
         if result["extra_cost"]:
-            reply.cost = (reply.cost or 0.0) + result["extra_cost"]
+            if reply.cost is None:
+                reply.cost = 0.0
+            reply.cost += result["extra_cost"]
 
         if result["extra_usage"]:
-            usage = dict(reply.usage or {})
+            usage = {}
+            if reply.usage:
+                usage = dict(reply.usage)
             for key, value in result["extra_usage"].items():
                 usage[key] = usage.get(key, 0) + value
             reply.usage = usage
