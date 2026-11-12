@@ -46,13 +46,14 @@ def vector_search(query, limit):
     documents = load_documents()
     embeddings = get_embeddings()
 
-    query_vector = None
-    for vector in get_model().query_embed([query]):
-        query_vector = vector
+    query_vectors = list(get_model().query_embed([query]))
+    query_vector = query_vectors[0]
 
     # The vectors are normalized, so the dot product is the cosine similarity
     scores = embeddings.dot(query_vector)
-    best_positions = np.argsort(scores)[::-1][:limit]
+
+    # argsort orders from low to high, so sorting the negative scores puts the best first
+    best_positions = np.argsort(-scores)[:limit]
 
     results = []
     for position in best_positions:
