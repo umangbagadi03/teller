@@ -2,9 +2,9 @@ import json
 import re
 
 from teller import config
-from teller.benchmark.task_split import get_task_ids, load_raw_tasks
+from teller.benchmark.task_split import get_required_ids, get_task_ids, load_raw_tasks
 from teller.knowledge.documents import load_documents
-from teller.knowledge.hybrid_search import hybrid_search, search_documents
+from teller.knowledge.hybrid_search import hybrid_rerank_search, hybrid_search
 from teller.knowledge.keyword_search import keyword_search
 from teller.knowledge.vector_search import vector_search
 
@@ -44,7 +44,7 @@ def measure_method(search_function, tasks):
 
     tasks_counted = 0
     for task in tasks:
-        required_ids = task.get("required_documents") or []
+        required_ids = get_required_ids(task)
         if not required_ids:
             continue
 
@@ -53,7 +53,31 @@ def measure_method(search_function, tasks):
             found_ids.append(document["id"])
 
         for top_k in TOP_K_VALUES:
-            totals[top_k] += measure_recall(required_ids, found_ids[:top_k])
+            top_ids = found_ids[:top_k]
+            totals[top_k] += measure_recall(required_ids, top_ids)
+        tasks_counted += 1
+
+    scores = {}
+    for top_k in TOP_K_VALUES:
+        scores["recall_at_" + str(top_k)] = round(totals[top_k] / tasks_counted, 3)
+    return scores
+
+
+def measure_best_possible(tasks):
+    # A task can need more documents than one search returns. This is the score
+    # a perfect search would get, so the real scores can be read against it.
+    totals = {}
+    for top_k in TOP_K_VALUES:
+        totals[top_k] = 0.0
+
+    tasks_counted = 0
+    for task in tasks:
+        needed = len(get_required_ids(task))
+        if needed == 0:
+            continue
+
+        for top_k in TOP_K_VALUES:
+            totals[top_k] += min(top_k, needed) / needed
         tasks_counted += 1
 
     scores = {}
@@ -97,7 +121,7 @@ def run_retrieval_eval():
         "BM25": keyword_search,
         "Embeddings": vector_search,
         "Hybrid": hybrid_search,
-        "Hybrid + reranker": search_documents,
+        "Hybrid + reranker": hybrid_rerank_search,
     }
 
     tool_names = find_tool_names()
@@ -111,7 +135,12 @@ def run_retrieval_eval():
         print(row)
 
     config.RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    report = {"tasks": len(tasks), "tool_names": len(tool_names), "table": table}
+    report = {
+        "tasks": len(tasks),
+        "tool_names": len(tool_names),
+        "best_possible": measure_best_possible(tasks),
+        "table": table,
+    }
     with open(RESULTS_FILE, "w") as file:
         json.dump(report, file, indent=2)
 

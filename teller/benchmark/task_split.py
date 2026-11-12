@@ -9,6 +9,14 @@ def load_raw_tasks():
         return json.load(file)
 
 
+def get_required_ids(task):
+    # The ids of the documents a task needs. Some tasks need none.
+    required_ids = task.get("required_documents")
+    if required_ids is None:
+        return []
+    return required_ids
+
+
 def get_task_ids(split):
     # The holdout tasks are kept aside and never used while tuning the agent,
     # so the final score is not inflated by fixes made for specific tasks.
