@@ -1,3 +1,7 @@
+import pytest
+
+from teller import config
+from teller.knowledge import hybrid_search
 from teller.knowledge.hybrid_search import combine_results
 from teller.knowledge.keyword_search import keyword_search, split_into_words
 
@@ -34,3 +38,23 @@ def test_combined_results_have_no_duplicates():
 def test_keyword_search_finds_an_exact_tool_name():
     results = keyword_search("open_bank_account_4821", 3)
     assert "open_bank_account_4821" in results[0]["content"]
+
+
+def test_equal_scores_keep_the_keyword_result_first():
+    combined = combine_results(make_documents(["keyword"]), make_documents(["vector"]), 2)
+    assert combined[0]["id"] == "keyword"
+
+
+def test_search_method_setting_picks_the_search(monkeypatch):
+    monkeypatch.setattr(config, "SEARCH_METHOD", "bm25")
+
+    results = hybrid_search.search_documents("open_bank_account_4821", 3)
+
+    assert "open_bank_account_4821" in results[0]["content"]
+
+
+def test_unknown_search_method_gives_a_clear_error(monkeypatch):
+    monkeypatch.setattr(config, "SEARCH_METHOD", "magic")
+
+    with pytest.raises(ValueError):
+        hybrid_search.search_documents("open an account", 3)

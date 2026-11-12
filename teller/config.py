@@ -41,6 +41,10 @@ CANDIDATES_PER_SEARCH = 20
 RESULTS_PER_SEARCH = 5
 RRF_K = 60
 
+# bm25, embeddings, hybrid or hybrid_rerank. Change it to compare search methods.
+DEFAULT_SEARCH_METHOD = "hybrid_rerank"
+SEARCH_METHOD = os.getenv("SEARCH_METHOD", DEFAULT_SEARCH_METHOD).strip().lower()
+
 # Agent limits
 MAX_SEARCHES_PER_STEP = 3
 MAX_CORRECTIONS_PER_STEP = 2
