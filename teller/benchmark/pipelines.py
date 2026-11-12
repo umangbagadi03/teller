@@ -19,7 +19,7 @@ PIPELINES = {
         "retrieval": "bm25",
     },
     "teller": {
-        "label": "Teller (hybrid, rerank, checks)",
+        "label": "Teller",
         "agent": TELLER_AGENT_NAME,
         "retrieval": "no_knowledge",
     },
@@ -44,7 +44,8 @@ latest_agent = None
 
 
 def create_agent(tools, domain_policy, use_checks, **kwargs):
-    # Kept so the runner can read which documents the agent found
+    # The benchmark passes many settings by name, and **kwargs collects them in a
+    # dictionary. The agent is kept so the runner can read which documents it found.
     global latest_agent
     latest_agent = TellerAgent(
         tools=tools,

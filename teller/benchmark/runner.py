@@ -7,17 +7,19 @@ from tau2.runner import get_tasks, run_single_task
 from teller import config
 from teller.benchmark.failures import classify_failure
 from teller.benchmark.pipelines import PIPELINES, get_latest_agent, register_teller_agent
-from teller.benchmark.task_split import get_task_ids, load_raw_tasks
+from teller.benchmark.retrieval_eval import measure_recall
+from teller.benchmark.task_split import get_required_ids, get_task_ids, load_raw_tasks
 from teller.llm.provider import get_llm_settings, get_model_name
 
 DOMAIN = "banking_knowledge"
 SEED = 300
+TELLER_PIPELINES = ["teller", "teller_no_checks", "teller_golden"]
 
 
 def get_required_documents():
     required_documents = {}
     for task in load_raw_tasks():
-        required_documents[task["id"]] = task.get("required_documents") or []
+        required_documents[task["id"]] = get_required_ids(task)
     return required_documents
 
 
@@ -34,22 +36,26 @@ def measure_document_recall(pipeline_name, required_ids):
     for document in agent.latest_state["documents"]:
         found_ids.append(document["id"])
 
-    hits = 0
-    for document_id in required_ids:
-        if document_id in found_ids:
-            hits += 1
-    return hits / len(required_ids)
+    return measure_recall(required_ids, found_ids)
 
 
 def count_tokens(messages):
     prompt_tokens = 0
     completion_tokens = 0
     for message in messages:
-        usage = getattr(message, "usage", None)
-        if usage:
-            prompt_tokens += usage.get("prompt_tokens", 0)
-            completion_tokens += usage.get("completion_tokens", 0)
+        # Only messages written by an LLM carry token counts
+        if message.role not in ["assistant", "user"]:
+            continue
+        if message.usage:
+            prompt_tokens += message.usage.get("prompt_tokens", 0)
+            completion_tokens += message.usage.get("completion_tokens", 0)
     return prompt_tokens, completion_tokens
+
+
+def number_or_zero(value):
+    if value is None:
+        return 0.0
+    return value
 
 
 def summarize_result(result, pipeline_name, required_ids):
@@ -69,8 +75,8 @@ def summarize_result(result, pipeline_name, required_ids):
         "document_recall": document_recall,
         "messages": len(result.messages),
         "seconds": round(result.duration, 1),
-        "agent_cost": result.agent_cost or 0.0,
-        "user_cost": result.user_cost or 0.0,
+        "agent_cost": number_or_zero(result.agent_cost),
+        "user_cost": number_or_zero(result.user_cost),
         "prompt_tokens": prompt_tokens,
         "completion_tokens": completion_tokens,
     }
@@ -127,11 +133,24 @@ def run_benchmark(pipeline_name, split, limit):
         task_ids = task_ids[:limit]
     tasks = get_tasks(DOMAIN, task_ids=task_ids)
 
+    # Teller pipelines search with SEARCH_METHOD. A run with another method than
+    # the usual one says so in its label, so the two can be told apart.
+    label = pipeline["label"]
+    search = pipeline["retrieval"]
+    usual_search = True
+    if pipeline_name in TELLER_PIPELINES:
+        search = config.SEARCH_METHOD
+        if search != config.DEFAULT_SEARCH_METHOD:
+            usual_search = False
+            label += ", search: " + search
+
     started_at = datetime.now().strftime("%Y%m%d-%H%M%S")
     run = {
         "id": pipeline_name + "-" + started_at,
         "pipeline": pipeline_name,
-        "label": pipeline["label"],
+        "label": label,
+        "search": search,
+        "usual_search": usual_search,
         "split": split,
         "model": get_model_name(),
         "tasks": [],

@@ -45,6 +45,7 @@ def summarize_run(run):
         "id": run["id"],
         "pipeline": run["pipeline"],
         "label": run["label"],
+        "usual_search": run["usual_search"],
         "split": run["split"],
         "model": run["model"],
         "tasks_run": count,

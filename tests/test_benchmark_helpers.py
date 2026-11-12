@@ -1,6 +1,7 @@
 from teller.benchmark.failures import classify_failure
 from teller.benchmark.report import summarize_run
-from teller.benchmark.task_split import get_task_ids
+from teller.benchmark.retrieval_eval import measure_best_possible, measure_recall
+from teller.benchmark.task_split import get_required_ids, get_task_ids
 
 
 def test_holdout_is_separate_from_development():
@@ -30,6 +31,7 @@ def test_run_summary():
         "id": "x",
         "pipeline": "teller",
         "label": "Teller",
+        "usual_search": True,
         "split": "development",
         "model": "m",
         "tasks": [
@@ -60,3 +62,22 @@ def test_run_summary():
     assert summary["seconds_per_task"] == 20.0
     assert summary["document_recall"] == 0.75
     assert summary["failures"] == {"passed": 1, "reasoning": 1}
+
+
+def test_recall_counts_the_required_documents_that_were_found():
+    assert measure_recall(["a", "b", "c", "d"], ["a", "x", "c"]) == 0.5
+
+
+def test_task_without_required_documents_gives_an_empty_list():
+    assert get_required_ids({"required_documents": None}) == []
+    assert get_required_ids({}) == []
+
+
+def test_best_possible_recall_is_limited_by_the_search_size():
+    # Ten documents are needed, and one search of five can find half of them at most
+    task = {"required_documents": ["d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9"]}
+
+    scores = measure_best_possible([task])
+
+    assert scores["recall_at_5"] == 0.5
+    assert scores["recall_at_10"] == 1.0
