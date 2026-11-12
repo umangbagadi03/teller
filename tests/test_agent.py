@@ -169,6 +169,21 @@ def test_search_call_after_the_limit_cannot_loop_forever(monkeypatch):
     reply, state, world = run_agent(monkeypatch, replies, [DOCUMENT])
 
     assert len(world.llm_prompts) == total_llm_calls
+    assert not reply.tool_calls
+    assert reply.content == nodes.BLOCKED_REPLY
+
+
+def test_search_call_after_the_limit_never_reaches_the_benchmark_without_checks(monkeypatch):
+    # The benchmark does not know the search tool, so this must hold in every pipeline
+    search_arguments = {"query": "open account"}
+    replies = []
+    total_llm_calls = config.MAX_SEARCHES_PER_STEP + config.MAX_CORRECTIONS_PER_STEP + 1
+    for number in range(total_llm_calls):
+        replies.append(make_reply(tool_name=SEARCH_TOOL_NAME, arguments=search_arguments))
+
+    reply, state, world = run_agent(monkeypatch, replies, [DOCUMENT], use_checks=False)
+
+    assert not reply.tool_calls
 
 
 def test_made_up_tool_is_blocked_and_llm_tries_again(monkeypatch):
@@ -210,7 +225,7 @@ def test_tool_name_in_the_policy_passes_the_check(monkeypatch):
     assert len(world.llm_prompts) == 1
 
 
-def test_corrections_stop_at_the_limit(monkeypatch):
+def test_blocked_call_never_goes_through_when_the_llm_keeps_trying(monkeypatch):
     bad_call = {"agent_tool_name": "made_up"}
     replies = [
         make_reply(tool_name=UNLOCK_TOOL, arguments=bad_call),
@@ -220,7 +235,41 @@ def test_corrections_stop_at_the_limit(monkeypatch):
     reply, state, world = run_agent(monkeypatch, replies, [DOCUMENT])
 
     assert len(world.llm_prompts) == 3
-    assert reply.tool_calls[0].name == UNLOCK_TOOL
+    assert not reply.tool_calls
+    assert reply.content == nodes.BLOCKED_REPLY
+    reply.validate()
+
+
+def test_account_change_before_verification_never_goes_through(monkeypatch):
+    # A customer can push the LLM to skip verification. The code still says no.
+    email_call = {"new_email": "attacker@example.com"}
+    replies = [
+        make_reply(tool_name="change_user_email", arguments=email_call),
+        make_reply(tool_name="change_user_email", arguments=email_call),
+        make_reply(tool_name="change_user_email", arguments=email_call),
+    ]
+    reply, state, world = run_agent(monkeypatch, replies, [DOCUMENT])
+
+    assert not reply.tool_calls
+    assert reply.content == nodes.BLOCKED_REPLY
+
+    blocked_count = 0
+    for step in state["trace"]:
+        if step["kind"] == "blocked":
+            blocked_count += 1
+    assert blocked_count == 3
+
+
+def test_blocked_reply_keeps_the_cost_of_every_try(monkeypatch):
+    bad_call = {"agent_tool_name": "made_up"}
+    replies = [
+        make_reply(tool_name=UNLOCK_TOOL, arguments=bad_call),
+        make_reply(tool_name=UNLOCK_TOOL, arguments=bad_call),
+        make_reply(tool_name=UNLOCK_TOOL, arguments=bad_call),
+    ]
+    reply, state, world = run_agent(monkeypatch, replies, [DOCUMENT])
+
+    assert round(reply.cost, 4) == 0.03
 
 
 def test_empty_reply_gets_another_try(monkeypatch):

@@ -13,6 +13,8 @@ CUSTOMER_SEARCH_RESULTS = 4
 EMPTY_REPLY_NOTE = "Your last reply was empty. Write a message to the customer or make a tool call."
 FALLBACK_REPLY = "I am sorry, could you please say that again?"
 SEARCH_LIMIT_NOTE = "Search limit reached. Answer with what you have, or ask the customer."
+BLOCKED_REPLY = "I am sorry, I cannot complete that step yet. Could you confirm what you would like me to do?"
+SKIPPED_CALL_NOTE = "Not run because another call in this turn was blocked."
 
 
 def add_found_documents(known_documents, found_documents):
@@ -40,10 +42,22 @@ def add_found_documents(known_documents, found_documents):
     return all_documents, added_documents
 
 
-def add_to_trace(state, kind, text, details=None):
-    trace = list(state["trace"])
-    trace.append({"kind": kind, "text": text, "details": details})
-    return trace
+def add_trace_event(trace, kind, text, details):
+    # The trace is what the web app shows in its Activity list
+    new_trace = list(trace)
+    new_trace.append({"kind": kind, "text": text, "details": details})
+    return new_trace
+
+
+def make_tool_message(tool_call, content, failed):
+    # The answer to a tool call that the agent handled itself
+    return ToolMessage(
+        id=tool_call.id,
+        role="tool",
+        content=content,
+        requestor="assistant",
+        error=failed,
+    )
 
 
 def get_titles(documents):
@@ -74,7 +88,7 @@ def retrieve_node(state):
     found = search_documents(customer_text, CUSTOMER_SEARCH_RESULTS)
     documents, added = add_found_documents(state["documents"], found)
 
-    trace = add_to_trace(state, "search", customer_text, get_titles(added))
+    trace = add_trace_event(state["trace"], "search", customer_text, get_titles(added))
     return {"documents": documents, "trace": trace}
 
 
@@ -94,6 +108,7 @@ def think_node(state, agent):
     if state["searches_used"] < config.MAX_SEARCHES_PER_STEP:
         tools.append(agent.search_tool)
 
+    # The two stars pass each LLM setting by name, like temperature=0.0
     reply = generate(
         model=agent.llm,
         tools=tools,
@@ -158,19 +173,12 @@ def search_node(state):
             query = tool_call.arguments.get("query", "")
             found = search_documents(query)
             documents, added = add_found_documents(documents, found)
-            trace = list(trace)
-            trace.append({"kind": "search", "text": query, "details": get_titles(added)})
+            trace = add_trace_event(trace, "search", query, get_titles(added))
 
             titles = get_titles(found)
             content = "Found: " + "; ".join(titles) + ". Their text is in your documents."
 
-        tool_message = ToolMessage(
-            id=tool_call.id,
-            role="tool",
-            content=content,
-            requestor="assistant",
-        )
-        messages.append(tool_message)
+        messages.append(make_tool_message(tool_call, content, False))
 
     extra_cost, extra_usage = keep_step_cost(state, reply)
     return {
@@ -194,8 +202,12 @@ def find_problems(state, agent):
     readable_documents.append({"content": agent.domain_policy})
 
     for tool_call in reply.tool_calls:
+        # A search call only reaches this node after the search limit
         if tool_call.name == SEARCH_TOOL_NAME:
             problems[tool_call.id] = SEARCH_LIMIT_NOTE
+            continue
+
+        if not agent.use_checks:
             continue
 
         problem = find_problem(tool_call, readable_documents, state["messages"])
@@ -229,6 +241,46 @@ def check_empty_reply(state, reply):
     }
 
 
+def add_blocked_events(trace, tool_calls, problems):
+    for tool_call in tool_calls:
+        if tool_call.id in problems:
+            problem = problems[tool_call.id]
+            trace = add_trace_event(trace, "blocked", tool_call.name, [problem])
+    return trace
+
+
+def send_back_to_llm(state, reply, problems):
+    # The blocked calls go back to the LLM with the reason, not to the bank
+    messages = list(state["messages"])
+    assistant_message = AssistantMessage(role="assistant", tool_calls=reply.tool_calls)
+    messages.append(assistant_message)
+
+    for tool_call in reply.tool_calls:
+        content = SKIPPED_CALL_NOTE
+        if tool_call.id in problems:
+            content = problems[tool_call.id]
+        messages.append(make_tool_message(tool_call, content, True))
+
+    extra_cost, extra_usage = keep_step_cost(state, reply)
+    return {
+        "messages": messages,
+        "reply": None,
+        "corrections_used": state["corrections_used"] + 1,
+        "extra_cost": extra_cost,
+        "extra_usage": extra_usage,
+        "trace": add_blocked_events(state["trace"], reply.tool_calls, problems),
+    }
+
+
+def stop_blocked_calls(state, reply, problems):
+    # The LLM kept making a blocked call after its corrections. The call is dropped,
+    # so it never reaches the bank, and the customer gets a short message instead.
+    trace = add_blocked_events(state["trace"], reply.tool_calls, problems)
+    reply.tool_calls = None
+    reply.content = BLOCKED_REPLY
+    return {"reply": reply, "trace": trace}
+
+
 def check_node(state, agent):
     reply = state["reply"]
 
@@ -239,45 +291,14 @@ def check_node(state, agent):
     if reply.tool_calls:
         reply.content = None
 
-    problems = {}
-    if agent.use_checks:
-        problems = find_problems(state, agent)
-
-    no_more_corrections = state["corrections_used"] >= config.MAX_CORRECTIONS_PER_STEP
-    if not problems or no_more_corrections:
+    problems = find_problems(state, agent)
+    if not problems:
         return {"reply": reply}
 
-    # Send the blocked calls back to the LLM instead of to the bank
-    messages = list(state["messages"])
-    trace = state["trace"]
-    assistant_message = AssistantMessage(role="assistant", tool_calls=reply.tool_calls)
-    messages.append(assistant_message)
+    if state["corrections_used"] < config.MAX_CORRECTIONS_PER_STEP:
+        return send_back_to_llm(state, reply, problems)
 
-    for tool_call in reply.tool_calls:
-        content = "Not run because another call in this turn was blocked."
-        if tool_call.id in problems:
-            content = problems[tool_call.id]
-            trace = list(trace)
-            trace.append({"kind": "blocked", "text": tool_call.name, "details": [content]})
-
-        tool_message = ToolMessage(
-            id=tool_call.id,
-            role="tool",
-            content=content,
-            requestor="assistant",
-            error=True,
-        )
-        messages.append(tool_message)
-
-    extra_cost, extra_usage = keep_step_cost(state, reply)
-    return {
-        "messages": messages,
-        "reply": None,
-        "corrections_used": state["corrections_used"] + 1,
-        "extra_cost": extra_cost,
-        "extra_usage": extra_usage,
-        "trace": trace,
-    }
+    return stop_blocked_calls(state, reply, problems)
 
 
 def route_after_check(state):
