@@ -21,8 +21,9 @@ def name_is_in_documents(tool_name, documents):
     if not tool_name:
         return False
 
-    # The whole name must match, so "account" does not pass because of "bank_account"
-    pattern = r"(?<![A-Za-z0-9_])" + re.escape(tool_name) + r"(?![A-Za-z0-9_])"
+    # \b means the edge of a word, and an underscore counts as part of a word.
+    # So the whole name must match: "account" does not pass because of "bank_account".
+    pattern = r"\b" + re.escape(tool_name) + r"\b"
 
     for document in documents:
         if re.search(pattern, document["content"]):
@@ -34,7 +35,7 @@ def get_successful_results(messages):
     # A call only counts if its result came back without an error
     successful_ids = []
     for message in messages:
-        if getattr(message, "role", "") != "tool":
+        if message.role != "tool":
             continue
         if message.error:
             continue
@@ -50,10 +51,9 @@ def get_successful_calls(messages):
 
     successful_calls = []
     for message in messages:
-        tool_calls = getattr(message, "tool_calls", None)
-        if not tool_calls:
+        if message.role != "assistant" or not message.tool_calls:
             continue
-        for tool_call in tool_calls:
+        for tool_call in message.tool_calls:
             if tool_call.id in successful_ids:
                 successful_calls.append(tool_call)
     return successful_calls
