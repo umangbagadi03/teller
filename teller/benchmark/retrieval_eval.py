@@ -10,7 +10,6 @@ from teller.knowledge.vector_search import vector_search
 
 RESULTS_FILE = config.RESULTS_DIR / "retrieval.json"
 TOP_K_VALUES = [5, 10, 20]
-TOOL_NAME_PATTERN = r"\b[a-z]+(?:_[a-z0-9]+)*_\d{4}\b"
 TOOL_NAME_TOP_K = 5
 
 
@@ -86,15 +85,32 @@ def measure_best_possible(tasks):
     return scores
 
 
+def looks_like_tool_name(word):
+    # Hidden tools are named like open_bank_account_4821:
+    # lowercase words joined by underscores, ending in four digits
+    parts = word.split("_")
+    if len(parts) < 2:
+        return False
+
+    last_part = parts[-1]
+    if len(last_part) != 4 or not last_part.isdigit():
+        return False
+
+    first_part = parts[0]
+    return first_part.isalpha() and word == word.lower()
+
+
 def find_tool_names():
     # Hidden tools have names like open_bank_account_4821. Each name is listed
     # with the documents that mention it, and the agent has to find one of them.
     tool_names = {}
     for document in load_documents():
-        for name in re.findall(TOOL_NAME_PATTERN, document["content"]):
-            if name not in tool_names:
-                tool_names[name] = []
-            tool_names[name].append(document["id"])
+        for word in re.findall(r"[A-Za-z0-9_]+", document["content"]):
+            if not looks_like_tool_name(word):
+                continue
+            if word not in tool_names:
+                tool_names[word] = []
+            tool_names[word].append(document["id"])
     return tool_names
 
 

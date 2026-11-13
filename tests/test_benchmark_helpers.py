@@ -1,6 +1,10 @@
 from teller.benchmark.failures import classify_failure
 from teller.benchmark.report import summarize_run
-from teller.benchmark.retrieval_eval import measure_best_possible, measure_recall
+from teller.benchmark.retrieval_eval import (
+    looks_like_tool_name,
+    measure_best_possible,
+    measure_recall,
+)
 from teller.benchmark.task_split import get_required_ids, get_task_ids
 
 
@@ -81,3 +85,11 @@ def test_best_possible_recall_is_limited_by_the_search_size():
 
     assert scores["recall_at_5"] == 0.5
     assert scores["recall_at_10"] == 1.0
+
+
+def test_only_hidden_tool_names_look_like_tool_names():
+    assert looks_like_tool_name("open_bank_account_4821")
+    assert not looks_like_tool_name("bank_account")
+    assert not looks_like_tool_name("account_48210")
+    assert not looks_like_tool_name("4821")
+    assert not looks_like_tool_name("Open_Account_4821")
