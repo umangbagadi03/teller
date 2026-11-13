@@ -17,7 +17,8 @@ def format_documents(documents):
     if not documents:
         return "No policy documents found yet."
 
-    # The newest documents are the most likely to matter, and this keeps prompts small
+    # The newest documents are the most likely to matter, and this keeps prompts small.
+    # A negative start counts from the end of the list, so this keeps the last 20.
     recent_documents = documents[-config.MAX_DOCUMENTS_IN_PROMPT:]
 
     parts = []

@@ -18,6 +18,8 @@ def build_graph(agent):
     #                                 search      |
     #                                  ^----------+ (blocked call goes back to think)
 
+    # LangGraph calls a node with only the state. These two small functions
+    # also hand over the agent, which holds the model, the tools and the policy.
     def think(state):
         return think_node(state, agent)
 
