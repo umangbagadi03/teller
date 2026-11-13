@@ -163,7 +163,10 @@ function addTimelineItem(iconName, label, title) {
 function addStep(step) {
   if (step.kind === "search") {
     const body = addTimelineItem("search", "Searched policies", step.text);
-    const titles = step.details || [];
+    let titles = [];
+    if (step.details) {
+      titles = step.details;
+    }
 
     if (titles.length === 0) {
       body.append(makeElement("p", "timeline-note", "No new documents"));
