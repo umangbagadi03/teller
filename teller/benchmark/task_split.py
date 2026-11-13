@@ -26,7 +26,9 @@ def get_task_ids(split):
     all_ids.sort()
 
     shuffled_ids = list(all_ids)
-    random.Random(config.SPLIT_SEED).shuffle(shuffled_ids)
+    # A shuffler with a fixed seed mixes the list the same way every time
+    shuffler = random.Random(config.SPLIT_SEED)
+    shuffler.shuffle(shuffled_ids)
 
     holdout_ids = shuffled_ids[:config.HOLDOUT_SIZE]
     development_ids = shuffled_ids[config.HOLDOUT_SIZE:]

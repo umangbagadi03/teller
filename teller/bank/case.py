@@ -16,7 +16,9 @@ class Case:
     # One customer conversation in the web app, with its own copy of the bank database
 
     def __init__(self):
-        self.id = uuid.uuid4().hex[:8]
+        # A random id, cut to its first 8 characters so it is easy to read
+        random_id = uuid.uuid4().hex
+        self.id = random_id[:8]
         database = TransactionalDB.load(str(get_demo_database_path()))
         self.environment = get_environment(db=database, retrieval_variant=RETRIEVAL_VARIANT)
         self.agent = TellerAgent(
