@@ -25,7 +25,9 @@ def get_required_documents():
 
 def measure_document_recall(pipeline_name, required_ids):
     # Only Teller keeps a list of what it found, and a golden run is handed the documents
-    if pipeline_name not in ["teller", "teller_no_checks"] or not required_ids:
+    if pipeline_name not in ["teller", "teller_no_checks"]:
+        return None
+    if not required_ids:
         return None
 
     agent = get_latest_agent()
