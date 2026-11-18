@@ -1,5 +1,4 @@
 import numpy as np
-from fastembed import TextEmbedding
 
 from teller import config
 from teller.knowledge.documents import get_search_text, load_documents
@@ -13,6 +12,9 @@ _embeddings = None
 def get_model():
     global _model
     if _model is None:
+        # Imported here, so BM25-only mode never loads the model library and stays small
+        from fastembed import TextEmbedding
+
         _model = TextEmbedding(model_name=config.EMBEDDING_MODEL)
     return _model
 

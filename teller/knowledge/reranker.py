@@ -1,5 +1,3 @@
-from fastembed.rerank.cross_encoder import TextCrossEncoder
-
 from teller import config
 from teller.knowledge.documents import get_search_text
 
@@ -9,6 +7,9 @@ _model = None
 def get_model():
     global _model
     if _model is None:
+        # Imported here, so BM25-only mode never loads the model library and stays small
+        from fastembed.rerank.cross_encoder import TextCrossEncoder
+
         _model = TextCrossEncoder(model_name=config.RERANKER_MODEL)
     return _model
 
