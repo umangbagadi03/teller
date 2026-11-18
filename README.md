@@ -63,7 +63,7 @@ bash setup.sh
 .venv/bin/python main.py index
 ```
 
-Add one key to `.env`. Teller picks the provider from the key it finds, in this order: Gemini, Anthropic, OpenAI. With no key it uses a local Ollama model. Set `LLM_PROVIDER` to force one.
+Add one key to `.env`. Teller picks the provider from the key it finds, in this order: Gemini, Anthropic, OpenAI. With no key it uses a local Ollama model if `OLLAMA_MODEL` is set, and otherwise the offline demo. Set `LLM_PROVIDER` to force one.
 
 Gemini has a free tier. If you hit its rate limit, set `LLM_PAUSE_SECONDS=4` in `.env`.
 
@@ -73,7 +73,13 @@ Gemini has a free tier. If you hit its rate limit, set `LLM_PAUSE_SECONDS=4` in 
 .venv/bin/python main.py serve
 ```
 
-Open http://127.0.0.1:8010. On the Branch desk you play the customer, and the customer file on the left has the details you need to pass verification. The working record on the right shows every search, blocked call and bank action, in the order they happened. Each case gets its own copy of the sample database. The web app shows Indian sample customers through a separate demo copy, while the benchmark keeps its original database so scores stay comparable.
+Open http://127.0.0.1:8010. It works with no key at all. The Model menu in the top bar picks how each new case runs:
+
+- **Server model**: whatever `.env` sets up.
+- **Offline demo**: a short script plays the language model, so the app runs with no key and no cost. Search, the checks and the bank tools are still real, and the email change works end to end, including a call the check blocks before verification. It never answers policy questions, and the benchmark refuses to run on it.
+- **Your own API key**: a visitor pastes a Gemini, Anthropic or OpenAI key. It is used for that case only, kept in memory, never written to disk or logs, and removed from any error message.
+
+On the Branch desk you play the customer, and the customer file on the left has the details you need to pass verification. The working record on the right shows every search, blocked call and bank action, in the order they happened. Each case gets its own copy of the sample database. The web app shows Indian sample customers through a separate demo copy, while the benchmark keeps its original database so scores stay comparable.
 
 ## Evaluation
 
@@ -128,6 +134,7 @@ tests/                   unit tests, no LLM calls
 - **A blocked call is a hard stop.** The LLM gets two corrections in a step. After that the call is dropped and the customer gets a message. A check that lets the call through after enough tries would fail exactly when someone pushes the agent.
 - **Automatic search runs only on the opening message.** Follow-ups like "yes please" found unrelated documents and pushed useful ones out of the prompt. After the first message, the LLM writes its own searches.
 - **Documents go in the system prompt, once.** They are not repeated in the message history. The newest 20 are kept, and a document found again moves back to the newest place. A quarter of the tasks need more than 12 documents.
+- **An offline mode instead of a broken page.** A public demo with no key would fail on the first message. The offline script keeps every other part real, so the flow can still be seen, and it is labelled on the page so nobody mistakes it for a model.
 - **Limits are hard limits.** At three searches in a step the search tool is removed, so the agent cannot loop on it. The step limit is 200, the benchmark's default.
 
 ## Limitations
