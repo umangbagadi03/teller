@@ -1,0 +1,10 @@
+# Deploys the web app on Render's free plan: https://render.com/deploy?repo=https://github.com/umangbagadi03/teller
+# The free plan has 512 MB of memory. Teller uses about 300 MB with full hybrid search.
+# No API key is set, so the site opens in the offline demo. Visitors can bring their own key.
+services:
+  - type: web
+    name: teller
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/status

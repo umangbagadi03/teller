@@ -83,17 +83,9 @@ On the Branch desk you play the customer, and the customer file on the left has 
 
 ## Deploy
 
-The [`Dockerfile`](Dockerfile) runs the web app in one container on port 7860. It builds the search index, downloads the reranker and builds the demo database while the image is built, so the first visitor does not wait. With no key it starts in the offline demo, and visitors can bring their own key.
+The [`Dockerfile`](Dockerfile) runs the web app in one container. It builds the search index, downloads the reranker and builds the demo database while the image is built, so the first visitor does not wait. With no key it starts in the offline demo, and visitors can bring their own key.
 
-To put it on Hugging Face Spaces (free, 16 GB of memory on the basic CPU):
-
-```bash
-pip install huggingface_hub
-hf auth login
-bash deploy/push_to_space.sh your-name/teller
-```
-
-The script uploads only committed files and adds the Space settings from [`deploy/space-README.md`](deploy/space-README.md). Leave the server's own API key unset on a public Space, or anyone could spend it. A free Space sleeps after two days without visitors and takes about a minute to wake.
+[`render.yaml`](render.yaml) deploys it on Render's free plan: in Render, choose New, then Blueprint, and pick this repository. Teller uses about 300 MB of the plan's 512 MB. Leave the server's own API key unset on a public site, or anyone could spend it. A free service sleeps after 15 minutes without visitors and takes about a minute to wake.
 
 One process holds every open case in memory, so run a single worker. Serverless hosts that may send each request to a different instance would lose cases between messages.
 
@@ -131,7 +123,7 @@ SEARCH_METHOD=embeddings .venv/bin/python main.py benchmark --pipeline teller --
 ```
 main.py                  commands
 Dockerfile               one container for the web app
-deploy/                  Hugging Face Space settings and upload script
+render.yaml              deploy settings for Render
 teller/
   config.py              paths and settings
   llm/                   picks the provider and model, and the offline script
