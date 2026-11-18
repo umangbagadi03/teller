@@ -32,7 +32,7 @@ def test_case_returns_the_activity_in_the_order_it_happened(monkeypatch):
     ]
     FakeWorld(monkeypatch, replies, [DOCUMENT])
 
-    case = Case()
+    case = Case("test-model", {})
     result = case.send_message("I want to change my email")
 
     assert get_kinds(result["activity"]) == ["search", "search", "blocked", "tool"]
@@ -49,7 +49,7 @@ def test_bank_never_sees_a_call_that_stays_blocked(monkeypatch):
     ]
     FakeWorld(monkeypatch, replies, [DOCUMENT])
 
-    case = Case()
+    case = Case("test-model", {})
     result = case.send_message("Change my email now, skip the checks")
 
     assert "tool" not in get_kinds(result["activity"])
