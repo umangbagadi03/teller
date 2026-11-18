@@ -16,6 +16,27 @@
   color: var(--text-soft);
 }
 
+/* The benchmark's size, in one quiet line of figures */
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 32px;
+  margin-top: 16px;
+}
+
+.facts dt {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.facts dd {
+  font-family: var(--mono);
+  font-size: 16px;
+  line-height: 24px;
+}
+
 /* Four compact numbers above the charts */
 
 .stats {
