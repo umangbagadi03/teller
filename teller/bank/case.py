@@ -6,7 +6,7 @@ from tau2.domains.banking_knowledge.environment import get_environment
 
 from teller.agent.teller_agent import TellerAgent
 from teller.bank.demo_data import get_demo_database_path
-from teller.llm.provider import get_model_name
+from teller.llm.provider import get_llm_settings, get_model_name
 
 MAX_TOOL_ROUNDS = 12
 RETRIEVAL_VARIANT = "no_knowledge"
@@ -15,7 +15,12 @@ RETRIEVAL_VARIANT = "no_knowledge"
 class Case:
     # One customer conversation in the web app, with its own copy of the bank database
 
-    def __init__(self):
+    def __init__(self, llm=None, llm_args=None):
+        # llm and llm_args come from the visitor's own key. None means the server's model.
+        if llm is None:
+            llm = get_model_name()
+            llm_args = get_llm_settings()
+
         # A random id, cut to its first 8 characters so it is easy to read
         random_id = uuid.uuid4().hex
         self.id = random_id[:8]
@@ -24,9 +29,11 @@ class Case:
         self.agent = TellerAgent(
             tools=self.environment.get_tools(),
             domain_policy=self.environment.get_policy(),
+            llm=llm,
+            llm_args=llm_args,
         )
         self.state = self.agent.get_init_state()
-        self.model = get_model_name()
+        self.model = llm
 
     def run_tool_calls(self, tool_calls):
         tool_events = []
@@ -49,6 +56,10 @@ class Case:
             return tool_messages[0], tool_events
 
         return MultiToolMessage(role="tool", tool_messages=tool_messages), tool_events
+
+    def get_api_key(self):
+        # Used only to remove the key from error messages
+        return self.agent.llm_args.get("api_key", "")
 
     def send_message(self, text):
         # Everything that happens for this message, in the order it happened
