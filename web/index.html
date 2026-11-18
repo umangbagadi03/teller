@@ -3,17 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%231d6b4f'/%3E%3Cpath d='M5.5 18.5h13M7.5 16.5v-5M10.5 16.5v-5M13.5 16.5v-5M16.5 16.5v-5M12 5.5l6.5 4h-13z' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <title>Teller | Support console</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="css/base.css?v=5">
-  <link rel="stylesheet" href="css/desk.css?v=7">
-  <script src="js/theme.js?v=5"></script>
+  <link rel="stylesheet" href="css/base.css?v=8">
+  <link rel="stylesheet" href="css/desk.css?v=8">
+  <script src="js/theme.js?v=8"></script>
 </head>
 <body>
   <header class="topbar">
     <a class="brand" href="index.html">
-      <svg class="brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M6 18v-7M10 18v-7M14 18v-7M18 18v-7M12 3l8 5H4z"/></svg>
+      <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="currentColor"/><path d="M5.5 18.5h13M7.5 16.5v-5M10.5 16.5v-5M13.5 16.5v-5M16.5 16.5v-5M12 5.5l6.5 4h-13z" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Teller
     </a>
     <nav class="nav">
@@ -108,8 +109,32 @@
 
       <div class="messages" id="messages">
         <div class="welcome" id="welcome">
-          <h2>Speak as the customer</h2>
-          <p>Teller looks up the bank's policy, verifies you, and then makes the change itself. Each case gets its own copy of the sample database, so nothing here touches real money.</p>
+          <div class="welcome-top">
+            <div class="welcome-text">
+              <h2>Speak as the customer</h2>
+              <p>Teller looks up the bank's policy, verifies you, and then makes the change itself. Each case gets its own copy of the sample database, so nothing here touches real money.</p>
+            </div>
+
+            <div class="bank-card" aria-label="Sample customer card">
+              <svg class="card-pattern" viewBox="0 0 400 250" preserveAspectRatio="none" aria-hidden="true"><path d="M0 120.0 L5 123.7 L10 127.3 L15 130.7 L20 133.8 L25 136.6 L30 139.0 L35 140.9 L40 142.2 L45 143.1 L50 143.3 L55 143.1 L60 142.3 L65 141.1 L70 139.4 L75 137.4 L80 135.1 L85 132.6 L90 130.0 L95 127.3 L100 124.7 L105 122.2 L110 120.0 L115 118.0 L120 116.3 L125 115.0 L130 114.0 L135 113.4 L140 113.2 L145 113.3 L150 113.8 L155 114.5 L160 115.4 L165 116.5 L170 117.6 L175 118.8 L180 119.9 L185 120.8 L190 121.6 L195 122.1 L200 122.3 L205 122.3 L210 121.8 L215 121.1 L220 120.0 L225 118.6 L230 116.9 L235 115.1 L240 113.0 L245 110.9 L250 108.8 L255 106.8 L260 104.9 L265 103.3 L270 101.9 L275 101.0 L280 100.4 L285 100.4 L290 100.8 L295 101.7 L300 103.1 L305 105.0 L310 107.4 L315 110.1 L320 113.2 L325 116.6 L330 120.1 L335 123.7 L340 127.3 L345 130.8 L350 134.1 L355 137.1 L360 139.7 L365 141.9 L370 143.6 L375 144.8 L380 145.4 L385 145.4 L390 144.9 L395 143.9 L400 142.3"/><path d="M0 142.6 L5 145.6 L10 148.2 L15 150.4 L20 152.1 L25 153.2 L30 153.8 L35 153.8 L40 153.3 L45 152.2 L50 150.6 L55 148.7 L60 146.3 L65 143.7 L70 140.9 L75 138.0 L80 135.0 L85 132.1 L90 129.4 L95 126.8 L100 124.6 L105 122.7 L110 121.2 L115 120.0 L120 119.3 L125 119.0 L130 119.0 L135 119.4 L140 120.1 L145 121.1 L150 122.2 L155 123.5 L160 124.7 L165 126.0 L170 127.2 L175 128.1 L180 128.9 L185 129.4 L190 129.6 L195 129.5 L200 129.1 L205 128.3 L210 127.3 L215 126.0 L220 124.4 L225 122.7 L230 121.0 L235 119.2 L240 117.4 L245 115.8 L250 114.4 L255 113.3 L260 112.6 L265 112.2 L270 112.3 L275 112.8 L280 113.8 L285 115.3 L290 117.2 L295 119.6 L300 122.3 L305 125.3 L310 128.6 L315 132.0 L320 135.4 L325 138.9 L330 142.2 L335 145.2 L340 148.0 L345 150.4 L350 152.3 L355 153.8 L360 154.7 L365 155.0 L370 154.7 L375 153.9 L380 152.5 L385 150.6 L390 148.3 L395 145.6 L400 142.6"/><path d="M0 161.2 L5 162.6 L10 163.5 L15 163.8 L20 163.5 L25 162.6 L30 161.3 L35 159.4 L40 157.1 L45 154.5 L50 151.6 L55 148.5 L60 145.2 L65 142.0 L70 138.9 L75 135.9 L80 133.2 L85 130.7 L90 128.7 L95 127.0 L100 125.8 L105 125.0 L110 124.6 L115 124.7 L120 125.1 L125 125.9 L130 127.0 L135 128.2 L140 129.7 L145 131.2 L150 132.6 L155 134.1 L160 135.3 L165 136.4 L170 137.2 L175 137.8 L180 138.0 L185 137.9 L190 137.5 L195 136.8 L200 135.8 L205 134.6 L210 133.2 L215 131.7 L220 130.2 L225 128.7 L230 127.4 L235 126.2 L240 125.2 L245 124.6 L250 124.4 L255 124.5 L260 125.1 L265 126.1 L270 127.5 L275 129.4 L280 131.7 L285 134.3 L290 137.2 L295 140.3 L300 143.5 L305 146.7 L310 149.9 L315 153.0 L320 155.8 L325 158.3 L330 160.4 L335 162.0 L340 163.1 L345 163.7 L350 163.7 L355 163.2 L360 162.0 L365 160.4 L370 158.2 L375 155.6 L380 152.7 L385 149.4 L390 146.0 L395 142.5 L400 138.9"/><path d="M0 172.9 L5 172.3 L10 171.2 L15 169.5 L20 167.4 L25 164.8 L30 161.9 L35 158.7 L40 155.4 L45 151.9 L50 148.5 L55 145.2 L60 142.0 L65 139.2 L70 136.6 L75 134.5 L80 132.8 L85 131.5 L90 130.7 L95 130.4 L100 130.6 L105 131.1 L110 132.1 L115 133.3 L120 134.8 L125 136.4 L130 138.2 L135 140.0 L140 141.7 L145 143.3 L150 144.7 L155 145.8 L160 146.7 L165 147.3 L170 147.5 L175 147.5 L180 147.1 L185 146.4 L190 145.5 L195 144.4 L200 143.2 L205 141.9 L210 140.6 L215 139.4 L220 138.3 L225 137.5 L230 136.9 L235 136.7 L240 136.8 L245 137.3 L250 138.3 L255 139.6 L260 141.4 L265 143.5 L270 145.9 L275 148.6 L280 151.4 L285 154.4 L290 157.3 L295 160.3 L300 163.0 L305 165.5 L310 167.7 L315 169.5 L320 170.8 L325 171.7 L330 172.0 L335 171.7 L340 170.8 L345 169.4 L350 167.5 L355 165.1 L360 162.3 L365 159.2 L370 155.8 L375 152.2 L380 148.5 L385 144.9 L390 141.3 L395 138.0 L400 135.0"/><path d="M0 177.0 L5 174.6 L10 171.8 L15 168.7 L20 165.3 L25 161.7 L30 158.1 L35 154.6 L40 151.1 L45 147.9 L50 145.0 L55 142.4 L60 140.3 L65 138.6 L70 137.4 L75 136.7 L80 136.6 L85 136.9 L90 137.6 L95 138.7 L100 140.2 L105 142.0 L110 143.9 L115 145.9 L120 148.0 L125 150.1 L130 152.0 L135 153.7 L140 155.3 L145 156.5 L150 157.4 L155 157.9 L160 158.2 L165 158.1 L170 157.7 L175 157.0 L180 156.1 L185 155.1 L190 153.9 L195 152.8 L200 151.7 L205 150.6 L210 149.8 L215 149.2 L220 149.0 L225 149.0 L230 149.4 L235 150.2 L240 151.4 L245 152.9 L250 154.8 L255 157.0 L260 159.3 L265 161.9 L270 164.6 L275 167.2 L280 169.8 L285 172.3 L290 174.5 L295 176.3 L300 177.8 L305 178.9 L310 179.4 L315 179.4 L320 178.9 L325 177.8 L330 176.2 L335 174.1 L340 171.5 L345 168.5 L350 165.3 L355 161.8 L360 158.1 L365 154.4 L370 150.7 L375 147.2 L380 143.9 L385 140.9 L390 138.3 L395 136.2 L400 134.6"/><path d="M0 174.9 L5 171.4 L10 167.7 L15 164.0 L20 160.4 L25 156.9 L30 153.7 L35 150.8 L40 148.3 L45 146.3 L50 144.7 L55 143.7 L60 143.1 L65 143.2 L70 143.7 L75 144.7 L80 146.1 L85 147.8 L90 149.9 L95 152.1 L100 154.5 L105 156.9 L110 159.3 L115 161.6 L120 163.6 L125 165.5 L130 167.0 L135 168.2 L140 169.0 L145 169.5 L150 169.7 L155 169.5 L160 169.0 L165 168.3 L170 167.3 L175 166.3 L180 165.1 L185 164.0 L190 163.0 L195 162.1 L200 161.4 L205 161.0 L210 160.9 L215 161.1 L220 161.7 L225 162.6 L230 163.9 L235 165.5 L240 167.3 L245 169.4 L250 171.7 L255 174.0 L260 176.3 L265 178.6 L270 180.7 L275 182.6 L280 184.2 L285 185.4 L290 186.1 L295 186.4 L300 186.2 L305 185.5 L310 184.2 L315 182.4 L320 180.2 L325 177.5 L330 174.5 L335 171.1 L340 167.6 L345 164.0 L350 160.3 L355 156.7 L360 153.2 L365 150.1 L370 147.2 L375 144.8 L380 142.9 L385 141.4 L390 140.6 L395 140.2 L400 140.5"/><path d="M0 169.9 L5 166.3 L10 162.9 L15 159.7 L20 156.9 L25 154.6 L30 152.7 L35 151.3 L40 150.4 L45 150.2 L50 150.4 L55 151.2 L60 152.5 L65 154.2 L70 156.2 L75 158.6 L80 161.2 L85 163.9 L90 166.6 L95 169.3 L100 171.9 L105 174.3 L110 176.4 L115 178.2 L120 179.6 L125 180.7 L130 181.4 L135 181.7 L140 181.7 L145 181.3 L150 180.6 L155 179.7 L160 178.6 L165 177.5 L170 176.3 L175 175.2 L180 174.1 L185 173.3 L190 172.6 L195 172.3 L200 172.3 L205 172.6 L210 173.2 L215 174.1 L220 175.4 L225 176.9 L230 178.7 L235 180.6 L240 182.6 L245 184.6 L250 186.6 L255 188.4 L260 190.0 L265 191.3 L270 192.2 L275 192.8 L280 192.9 L285 192.5 L290 191.6 L295 190.2 L300 188.3 L305 186.0 L310 183.3 L315 180.3 L320 177.0 L325 173.5 L330 170.0 L335 166.4 L340 162.9 L345 159.7 L350 156.7 L355 154.0 L360 151.9 L365 150.2 L370 149.0 L375 148.4 L380 148.3 L385 148.9 L390 150.0 L395 151.6 L400 153.6"/><path d="M0 166.1 L5 163.5 L10 161.3 L15 159.6 L20 158.5 L25 157.9 L30 157.9 L35 158.4 L40 159.5 L45 161.1 L50 163.1 L55 165.5 L60 168.2 L65 171.0 L70 174.0 L75 177.1 L80 180.1 L85 182.9 L90 185.5 L95 187.9 L100 189.9 L105 191.5 L110 192.8 L115 193.6 L120 194.0 L125 194.0 L130 193.6 L135 192.9 L140 192.0 L145 190.9 L150 189.6 L155 188.2 L160 186.9 L165 185.7 L170 184.6 L175 183.7 L180 183.1 L185 182.7 L190 182.7 L195 183.0 L200 183.6 L205 184.5 L210 185.7 L215 187.1 L220 188.7 L225 190.4 L230 192.1 L235 193.8 L240 195.3 L245 196.7 L250 197.7 L255 198.5 L260 198.9 L265 198.9 L270 198.4 L275 197.4 L280 196.0 L285 194.1 L290 191.8 L295 189.2 L300 186.2 L305 183.0 L310 179.7 L315 176.3 L320 172.9 L325 169.7 L330 166.6 L335 163.9 L340 161.5 L345 159.6 L350 158.2 L355 157.3 L360 157.0 L365 157.3 L370 158.1 L375 159.5 L380 161.4 L385 163.7 L390 166.5 L395 169.5 L400 172.8"/><path d="M0 167.3 L5 166.4 L10 166.1 L15 166.4 L20 167.2 L25 168.6 L30 170.5 L35 172.8 L40 175.5 L45 178.5 L50 181.6 L55 184.9 L60 188.2 L65 191.4 L70 194.5 L75 197.3 L80 199.8 L85 202.0 L90 203.7 L95 205.0 L100 205.9 L105 206.3 L110 206.3 L115 205.8 L120 205.1 L125 204.0 L130 202.7 L135 201.2 L140 199.7 L145 198.1 L150 196.6 L155 195.2 L160 194.0 L165 193.1 L170 192.4 L175 192.0 L180 192.0 L185 192.3 L190 192.8 L195 193.7 L200 194.8 L205 196.0 L210 197.4 L215 198.9 L220 200.3 L225 201.6 L230 202.8 L235 203.8 L240 204.4 L245 204.7 L250 204.6 L255 204.1 L260 203.1 L265 201.8 L270 200.0 L275 197.8 L280 195.3 L285 192.5 L290 189.5 L295 186.3 L300 183.2 L305 180.0 L310 177.1 L315 174.3 L320 171.8 L325 169.8 L330 168.1 L335 167.0 L340 166.5 L345 166.4 L350 167.0 L355 168.1 L360 169.8 L365 172.0 L370 174.6 L375 177.6 L380 180.8 L385 184.3 L390 187.9 L395 191.4 L400 195.0"/></svg>
+              <div class="card-row">
+                <span class="card-brand"><svg class="card-mark" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="currentColor"/><path d="M5.5 18.5h13M7.5 16.5v-5M10.5 16.5v-5M13.5 16.5v-5M16.5 16.5v-5M12 5.5l6.5 4h-13z" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Teller Bank</span>
+                <span class="card-status" id="card-status">Not verified</span>
+              </div>
+              <span class="card-chip" aria-hidden="true"></span>
+              <p class="card-number" id="card-number">•••• ••••</p>
+              <div class="card-row card-bottom">
+                <span>
+                  <span class="card-label">Customer</span>
+                  <span class="card-value" id="card-name">Loading</span>
+                </span>
+                <span>
+                  <span class="card-label">City</span>
+                  <span class="card-value" id="card-city"></span>
+                </span>
+              </div>
+            </div>
+          </div>
           <ol class="pipeline" aria-label="How Teller handles a message">
             <li><span class="pipeline-number">01</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><span class="pipeline-title">Search</span><span class="pipeline-text">Finds the bank policies for your request</span></li>
             <li><span class="pipeline-number">02</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg><span class="pipeline-title">Think</span><span class="pipeline-text">The model reads them and picks the next step</span></li>
@@ -152,8 +177,8 @@
     </aside>
   </main>
 
-  <script src="js/api.js?v=5"></script>
-  <script src="js/model.js?v=5"></script>
-  <script src="js/desk.js?v=5"></script>
+  <script src="js/api.js?v=8"></script>
+  <script src="js/model.js?v=8"></script>
+  <script src="js/desk.js?v=8"></script>
 </body>
 </html>

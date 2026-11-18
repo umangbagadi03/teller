@@ -30,6 +30,13 @@ const customerList = document.getElementById("customer-list");
 const currentAvatar = document.getElementById("current-avatar");
 const currentName = document.getElementById("current-name");
 const verifyBadge = document.getElementById("verify-badge");
+const cardStatus = document.getElementById("card-status");
+const cardNumber = document.getElementById("card-number");
+const cardName = document.getElementById("card-name");
+const cardCity = document.getElementById("card-city");
+
+// The logo: a green tile with a white bank front
+const MARK = '<svg class="message-mark" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="currentColor"/><path d="M5.5 18.5h13M7.5 16.5v-5M10.5 16.5v-5M13.5 16.5v-5M16.5 16.5v-5M12 5.5l6.5 4h-13z" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const caseNumber = document.getElementById("case-number");
 const caseModel = document.getElementById("case-model");
 const offlineNote = document.getElementById("offline-note");
@@ -118,8 +125,17 @@ function showProfile() {
   }
 }
 
+function showCard(customer) {
+  // The card shows only the last 4 characters of the customer ID, like a real card
+  const id = customer.user_id;
+  cardNumber.textContent = "•••• " + id.slice(id.length - 4);
+  cardName.textContent = customer.name;
+  cardCity.textContent = getCity(customer.address);
+}
+
 function selectCustomer(customer) {
   selectedCustomer = customer;
+  showCard(customer);
   currentAvatar.textContent = getInitials(customer.name);
   currentName.textContent = customer.name;
   showCustomerList();
@@ -166,9 +182,13 @@ function showVerified(isVerified) {
   if (isVerified) {
     verifyBadge.textContent = "Verified";
     verifyBadge.classList.add("verify-done");
+    cardStatus.textContent = "Verified";
+    cardStatus.classList.add("card-verified");
   } else {
     verifyBadge.textContent = "Not verified";
     verifyBadge.classList.remove("verify-done");
+    cardStatus.textContent = "Not verified";
+    cardStatus.classList.remove("card-verified");
   }
 }
 
@@ -176,7 +196,11 @@ function addMessage(author, text, className) {
   welcome.hidden = true;
 
   const message = makeElement("div", "message " + className);
-  message.append(makeElement("p", "message-author", author + " · " + getTime()));
+  const authorLine = makeElement("p", "message-author", author + " · " + getTime());
+  if (author === "Teller") {
+    authorLine.insertAdjacentHTML("afterbegin", MARK);
+  }
+  message.append(authorLine);
   message.append(makeElement("p", "message-text", text));
   messages.append(message);
   messages.scrollTop = messages.scrollHeight;
