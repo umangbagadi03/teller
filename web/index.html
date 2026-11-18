@@ -5,18 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Teller | Support console</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/desk.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="css/base.css?v=2">
+  <link rel="stylesheet" href="css/desk.css?v=2">
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="index.html"><span class="brand-mark">T</span>Teller</a>
+    <a class="brand" href="index.html">
+      <svg class="brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M6 18v-7M10 18v-7M14 18v-7M18 18v-7M12 3l8 5H4z"/></svg>
+      Teller
+    </a>
     <nav class="nav">
       <a class="nav-link nav-link-active" href="index.html">Console</a>
       <a class="nav-link" href="results.html">Results</a>
     </nav>
-    <p class="model-chip" id="model-line">Checking model</p>
+    <p class="model-line" id="model-line">Checking model</p>
   </header>
 
   <main class="console">
@@ -42,7 +45,8 @@
       <div class="messages" id="messages">
         <div class="welcome" id="welcome">
           <h2>Speak as the customer</h2>
-          <p>Teller searches bank policy, checks the account and takes the action. Everything runs on a private copy of the sample database.</p>
+          <p>Teller looks up the bank's policy, verifies you, and then makes the change itself. Each case gets its own copy of the sample database, so nothing here touches real money.</p>
+          <p class="suggestions-label">Try a request</p>
           <div class="suggestions" id="suggestions"></div>
         </div>
       </div>
@@ -66,7 +70,7 @@
           <div><dt>Actions</dt><dd id="stat-actions">0</dd></div>
           <div><dt>LLM cost</dt><dd id="stat-cost">$0.00</dd></div>
         </dl>
-        <p class="activity-empty" id="activity-empty">Searches, blocked calls and bank actions appear here as the case runs.</p>
+        <p class="activity-empty" id="activity-empty">Every search, blocked call and bank action is logged here, newest first.</p>
         <ol class="timeline" id="timeline"></ol>
       </div>
 
@@ -77,7 +81,7 @@
     </aside>
   </main>
 
-  <script src="js/api.js"></script>
-  <script src="js/desk.js"></script>
+  <script src="js/api.js?v=2"></script>
+  <script src="js/desk.js?v=2"></script>
 </body>
 </html>

@@ -13,10 +13,13 @@ const PROFILE_FIELDS = [
   { key: "address", label: "Address" },
 ];
 
+// Line icons from the lucide set, all 16px with a 1.5 stroke
+const ICON_START = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
 const ICONS = {
-  search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>',
-  done: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg>',
-  blocked: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  search: ICON_START + '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+  done: ICON_START + '<path d="M20 6 9 17l-5-5"/></svg>',
+  blocked: ICON_START + '<circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>',
+  arrow: ICON_START + '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>',
 };
 
 const customerCount = document.getElementById("customer-count");
@@ -48,6 +51,7 @@ let customers = [];
 let selectedCustomer = null;
 let currentCaseId = null;
 let actionCount = 0;
+let entryCount = 0;
 let totalCost = 0;
 
 function makeElement(tag, className, text) {
@@ -98,8 +102,10 @@ function showCustomerList() {
 function showProfile() {
   profile.replaceChildren();
   for (const field of PROFILE_FIELDS) {
-    profile.append(makeElement("dt", "", field.label));
-    profile.append(makeElement("dd", "", selectedCustomer[field.key]));
+    const row = makeElement("div");
+    row.append(makeElement("dt", "", field.label));
+    row.append(makeElement("dd", "", selectedCustomer[field.key]));
+    profile.append(row);
   }
 }
 
@@ -114,8 +120,10 @@ function selectCustomer(customer) {
 
 function showSuggestions() {
   for (const text of SUGGESTIONS) {
-    const button = makeElement("button", "suggestion", text);
+    const button = makeElement("button", "suggestion");
     button.type = "button";
+    button.append(makeElement("span", "", text));
+    button.insertAdjacentHTML("beforeend", ICONS.arrow);
     button.addEventListener("click", function () {
       messageInput.value = text;
       messageInput.focus();
@@ -145,17 +153,27 @@ function addTypingMessage() {
 }
 
 function addTimelineItem(iconName, label, title) {
+  // Each entry gets a line number, like a row in a ledger
   activityEmpty.hidden = true;
+  entryCount += 1;
 
-  const item = makeElement("li", "timeline-item");
-  const icon = makeElement("span", "timeline-icon icon-" + iconName);
-  icon.innerHTML = ICONS[iconName];
+  let number = String(entryCount);
+  if (entryCount < 10) {
+    number = "0" + number;
+  }
+
+  const item = makeElement("li", "timeline-item kind-" + iconName);
+  item.append(makeElement("span", "timeline-number", number));
+
+  const labelLine = makeElement("p", "timeline-label");
+  labelLine.innerHTML = ICONS[iconName];
+  labelLine.append(label);
 
   const body = makeElement("div");
-  body.append(makeElement("p", "timeline-label", label));
+  body.append(labelLine);
   body.append(makeElement("p", "timeline-title", title));
 
-  item.append(icon, body);
+  item.append(body);
   timeline.prepend(item);
   return body;
 }
@@ -189,14 +207,15 @@ function addStep(step) {
 
 function addAction(action) {
   let iconName = "done";
-  let label = "Bank action";
+  let label = "Bank action ran";
   if (action.failed) {
     iconName = "blocked";
     label = "Bank action failed";
   }
 
   const body = addTimelineItem(iconName, label, action.text);
-  const code = JSON.stringify(action.arguments, null, 1);
+  // Show the arguments as indented JSON, one field per line
+  const code = JSON.stringify(action.arguments, null, 2);
   body.append(makeElement("pre", "timeline-code", code));
 
   actionCount += 1;
@@ -228,6 +247,7 @@ function clearCaseView() {
   activityEmpty.hidden = false;
   formError.textContent = "";
   actionCount = 0;
+  entryCount = 0;
   totalCost = 0;
   statDocuments.textContent = "0";
   statActions.textContent = "0";
