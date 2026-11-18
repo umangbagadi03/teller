@@ -8,6 +8,8 @@ from teller.agent.prompts import build_system_prompt
 from teller.agent.rules import find_problem
 from teller.agent.search_tool import SEARCH_TOOL_NAME
 from teller.knowledge.hybrid_search import search_documents
+from teller.llm.offline import offline_reply
+from teller.llm.provider import is_offline
 
 CUSTOMER_SEARCH_RESULTS = 4
 EMPTY_REPLY_NOTE = "Your last reply was empty. Write a message to the customer or make a tool call."
@@ -93,15 +95,21 @@ def retrieve_node(state):
 
 
 def think_node(state, agent):
-    if config.LLM_PAUSE_SECONDS > 0:
-        time.sleep(config.LLM_PAUSE_SECONDS)
-
     system_prompt = build_system_prompt(
         agent.domain_policy,
         state["documents"],
         state["correction_note"],
     )
     system_message = SystemMessage(role="system", content=system_prompt)
+    all_messages = [system_message] + state["messages"]
+
+    # The offline demo answers with a script instead of an LLM
+    if is_offline(agent.llm):
+        reply = offline_reply(all_messages)
+        return {"reply": reply, "correction_note": ""}
+
+    if config.LLM_PAUSE_SECONDS > 0:
+        time.sleep(config.LLM_PAUSE_SECONDS)
 
     # Once the limit is reached, the LLM is no longer offered the search tool
     tools = list(agent.tools)
@@ -112,7 +120,7 @@ def think_node(state, agent):
     reply = generate(
         model=agent.llm,
         tools=tools,
-        messages=[system_message] + state["messages"],
+        messages=all_messages,
         call_name="agent_response",
         **agent.llm_args,
     )
