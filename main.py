@@ -2,10 +2,19 @@ import argparse
 
 
 def index_command():
+    # Prepares everything that works without an LLM, so the first visitor does not wait
+    from teller.bank.demo_data import build_demo_database
+    from teller.knowledge.reranker import get_model
     from teller.knowledge.vector_search import build_index
 
     count = build_index()
     print("Indexed", count, "documents")
+
+    get_model()
+    print("Reranker ready")
+
+    build_demo_database()
+    print("Demo database ready")
 
 
 def retrieval_command():
@@ -22,10 +31,10 @@ def benchmark_command(pipeline, split, limit):
     print(summarize_run(run))
 
 
-def serve_command(port):
+def serve_command(host, port):
     import uvicorn
 
-    uvicorn.run("teller.api.server:app", host="127.0.0.1", port=port)
+    uvicorn.run("teller.api.server:app", host=host, port=port)
 
 
 def build_parser():
@@ -50,6 +59,7 @@ def build_parser():
 
     serve_parser = commands.add_parser("serve", help="start the web app")
     serve_parser.add_argument("--port", type=int, default=8010)
+    serve_parser.add_argument("--host", default="127.0.0.1", help="0.0.0.0 inside a container")
 
     return parser
 
@@ -65,4 +75,4 @@ if __name__ == "__main__":
     elif args.command == "benchmark":
         benchmark_command(args.pipeline, args.split, args.limit)
     elif args.command == "serve":
-        serve_command(args.port)
+        serve_command(args.host, args.port)
