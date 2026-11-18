@@ -20,12 +20,23 @@ async function postJson(path, body) {
   return readJson(response);
 }
 
+const PROVIDER_NAMES = {
+  gemini: "Gemini",
+  anthropic: "Anthropic",
+  openai: "OpenAI",
+  ollama: "Ollama",
+};
+
 async function showModelLine() {
   const line = document.getElementById("model-line");
   try {
     const status = await getJson("/api/status");
-    const modelName = status.model.split("/").slice(1).join("/");
-    line.textContent = status.provider + " · " + modelName;
+
+    // The model looks like "gemini/gemini-2.5-flash-lite". Keep what is after the first slash.
+    const slash = status.model.indexOf("/");
+    const modelName = status.model.slice(slash + 1);
+
+    line.textContent = PROVIDER_NAMES[status.provider] + " · " + modelName;
   } catch (error) {
     line.textContent = "Model not available";
   }
