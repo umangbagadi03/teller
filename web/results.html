@@ -3,17 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%231d6b4f'/%3E%3Cpath d='M5.5 18.5h13M7.5 16.5v-5M10.5 16.5v-5M13.5 16.5v-5M16.5 16.5v-5M12 5.5l6.5 4h-13z' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <title>Teller | Results</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="css/base.css?v=5">
-  <link rel="stylesheet" href="css/results.css?v=5">
-  <script src="js/theme.js?v=5"></script>
+  <link rel="stylesheet" href="css/base.css?v=8">
+  <link rel="stylesheet" href="css/results.css?v=8">
+  <script src="js/theme.js?v=8"></script>
 </head>
 <body>
   <header class="topbar">
     <a class="brand" href="index.html">
-      <svg class="brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M6 18v-7M10 18v-7M14 18v-7M18 18v-7M12 3l8 5H4z"/></svg>
+      <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="currentColor"/><path d="M5.5 18.5h13M7.5 16.5v-5M10.5 16.5v-5M13.5 16.5v-5M16.5 16.5v-5M12 5.5l6.5 4h-13z" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Teller
     </a>
     <nav class="nav">
@@ -31,6 +32,12 @@
     <div class="page-head">
       <h1>Evaluation results</h1>
       <p>Tasks come from the banking_knowledge domain of τ-Bench. A task passes only when the bank database ends in the correct state, so a good answer with the wrong change still fails.</p>
+      <dl class="facts">
+        <div><dt>Documents</dt><dd>698</dd></div>
+        <div><dt>Tasks</dt><dd>97</dd></div>
+        <div><dt>Held out</dt><dd>20</dd></div>
+        <div><dt>Hidden tools</dt><dd>46</dd></div>
+      </dl>
     </div>
 
     <section class="stats">
@@ -137,7 +144,7 @@
     </section>
   </main>
 
-  <script src="js/api.js?v=5"></script>
-  <script src="js/results.js?v=5"></script>
+  <script src="js/api.js?v=8"></script>
+  <script src="js/results.js?v=8"></script>
 </body>
 </html>
