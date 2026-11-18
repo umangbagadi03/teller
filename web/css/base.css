@@ -9,10 +9,19 @@
   --text-soft: #525252;
   --muted: #737373;
 
+  /* Hover and selection, a small step darker than the surface */
+  --hover: rgba(23, 23, 23, 0.04);
+  --active: rgba(23, 23, 23, 0.06);
+  --bar: #b5b5ba;
+  --shadow: rgba(0, 0, 0, 0.04);
+  --shadow-float: rgba(0, 0, 0, 0.08);
+
   /* The one accent: the green ink of a bank ledger */
   --accent: #1d6b4f;
   --accent-dark: #16533d;
+  --accent-text: #1d6b4f;
   --accent-ring: rgba(29, 107, 79, 0.18);
+  --on-accent: #ffffff;
 
   /* Meaning only: a posted action and a stopped one */
   --positive: #15803d;
@@ -21,6 +30,35 @@
   --font: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
   --mono: "IBM Plex Mono", Menlo, monospace;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: light;
+}
+
+/* Dark theme: the same roles on a near black graphite ramp. theme.js sets data-theme. */
+:root[data-theme="dark"] {
+  --page: #141415;
+  --surface: #19191b;
+  --raised: #232325;
+  --line: rgba(237, 237, 237, 0.08);
+  --line-strong: rgba(237, 237, 237, 0.14);
+  --text: #ededed;
+  --text-soft: #a1a1a6;
+  --muted: #85858b;
+
+  --hover: rgba(237, 237, 237, 0.04);
+  --active: rgba(237, 237, 237, 0.07);
+  --bar: #4a4a50;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --shadow-float: rgba(0, 0, 0, 0.5);
+
+  --accent: #23805e;
+  --accent-dark: #2a916b;
+  --accent-text: #6fcca5;
+  --accent-ring: rgba(111, 204, 165, 0.22);
+  --on-accent: #ffffff;
+
+  --positive: #4cc38a;
+  --negative: #ef5a5f;
+  color-scheme: dark;
 }
 
 * {
@@ -135,6 +173,40 @@ code {
   color: var(--text);
 }
 
+.theme-button {
+  display: grid;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  margin-left: 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-soft);
+  place-items: center;
+  transition: background-color 150ms var(--ease), color 150ms var(--ease);
+}
+
+.theme-button:hover {
+  background: var(--raised);
+  color: var(--text);
+}
+
+.theme-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Show the moon in light mode and the sun in dark mode: the button shows where it goes */
+.theme-button .icon-sun,
+:root[data-theme="dark"] .theme-button .icon-moon {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-button .icon-sun {
+  display: block;
+}
+
 .model-line {
   margin-left: auto;
   color: var(--muted);
@@ -156,7 +228,7 @@ code {
   }
 
   .model-line {
-    width: 100%;
+    flex: 1;
     margin: 0 0 4px;
   }
 }
