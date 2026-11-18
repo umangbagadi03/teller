@@ -81,6 +81,22 @@ Open http://127.0.0.1:8010. It works with no key at all. The Model menu in the t
 
 On the Branch desk you play the customer, and the customer file on the left has the details you need to pass verification. The working record on the right shows every search, blocked call and bank action, in the order they happened. Each case gets its own copy of the sample database. The web app shows Indian sample customers through a separate demo copy, while the benchmark keeps its original database so scores stay comparable.
 
+## Deploy
+
+The [`Dockerfile`](Dockerfile) runs the web app in one container on port 7860. It builds the search index, downloads the reranker and builds the demo database while the image is built, so the first visitor does not wait. With no key it starts in the offline demo, and visitors can bring their own key.
+
+To put it on Hugging Face Spaces (free, 16 GB of memory on the basic CPU):
+
+```bash
+pip install huggingface_hub
+hf auth login
+bash deploy/push_to_space.sh your-name/teller
+```
+
+The script uploads only committed files and adds the Space settings from [`deploy/space-README.md`](deploy/space-README.md). Leave the server's own API key unset on a public Space, or anyone could spend it. A free Space sleeps after two days without visitors and takes about a minute to wake.
+
+One process holds every open case in memory, so run a single worker. Serverless hosts that may send each request to a different instance would lose cases between messages.
+
 ## Evaluation
 
 Compare search methods. This runs locally and has no API cost:
@@ -114,9 +130,11 @@ SEARCH_METHOD=embeddings .venv/bin/python main.py benchmark --pipeline teller --
 
 ```
 main.py                  commands
+Dockerfile               one container for the web app
+deploy/                  Hugging Face Space settings and upload script
 teller/
   config.py              paths and settings
-  llm/provider.py        picks the provider and model from .env
+  llm/                   picks the provider and model, and the offline script
   knowledge/             BM25, embeddings, reranker, hybrid search
   agent/                 LangGraph agent: state, prompts, nodes, rules, graph
   bank/                  a customer case in the web app
