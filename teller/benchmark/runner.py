@@ -9,7 +9,7 @@ from teller.benchmark.failures import classify_failure
 from teller.benchmark.pipelines import PIPELINES, get_latest_agent, register_teller_agent
 from teller.benchmark.retrieval_eval import measure_recall
 from teller.benchmark.task_split import get_required_ids, get_task_ids, load_raw_tasks
-from teller.llm.provider import get_llm_settings, get_model_name
+from teller.llm.provider import get_llm_settings, get_model_name, pick_provider
 
 DOMAIN = "banking_knowledge"
 SEED = 300
@@ -124,6 +124,13 @@ def save_run(run):
 
 
 def run_benchmark(pipeline_name, split, limit):
+    # A score needs a real model. The offline script would only measure itself.
+    if pick_provider() == "offline":
+        raise SystemExit(
+            "The benchmark needs a real model. Add GEMINI_API_KEY, ANTHROPIC_API_KEY or "
+            "OPENAI_API_KEY to .env, or set OLLAMA_MODEL for a local model."
+        )
+
     register_teller_agent()
 
     pipeline = PIPELINES[pipeline_name]
