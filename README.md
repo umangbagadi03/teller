@@ -2,6 +2,8 @@
 
 Teller is a bank support agent that reads policy documents and then acts on them. It talks to the customer, finds the right policy, looks up the account, and makes the change in the bank's database.
 
+**Live demo:** https://teller-7yxh.onrender.com. It opens in the offline demo with no key needed: try "I need to change the email address on my account". Open **Model** to use your own Gemini, Anthropic or OpenAI key. It runs on a free plan, so the first visit after a quiet spell takes about a minute to wake, and it searches with BM25 to fit in 512 MB.
+
 It is measured on the `banking_knowledge` domain of [τ-Bench](https://github.com/sierra-research/tau2-bench), an open benchmark for customer service agents. The domain has 698 policy documents and 97 tasks. A simulated customer talks to the agent, and a task passes only when the database ends in the correct state. Many action tools are hidden until the agent finds their exact names in the documents, so weak retrieval fails the task, not just the wording of an answer.
 
 ## How it works
