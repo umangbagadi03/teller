@@ -588,3 +588,202 @@
     max-width: 88%;
   }
 }
+
+/* Model menu in the top bar */
+
+.model-menu {
+  position: relative;
+  margin-left: auto;
+}
+
+.model-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 8px 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--surface);
+  font-family: var(--mono);
+  font-size: 12px;
+  transition: background-color 150ms var(--ease);
+}
+
+.model-button:hover {
+  background: var(--raised);
+}
+
+.model-button-label {
+  color: var(--muted);
+  font-family: var(--font);
+}
+
+.model-button svg {
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+}
+
+.model-panel {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  z-index: 10;
+  width: 360px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.model-panel h2 {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.model-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 12px;
+}
+
+.model-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.model-option:hover {
+  background: var(--page);
+}
+
+.model-option input {
+  margin: 3px 0 0;
+  accent-color: var(--accent);
+}
+
+.model-option-title {
+  display: block;
+}
+
+.model-option-note {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.key-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.field input,
+.field select {
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+
+.key-note {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.model-error {
+  margin-top: 8px;
+  color: var(--negative);
+  font-size: 12px;
+}
+
+.model-error:empty {
+  display: none;
+}
+
+.model-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.primary-button {
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background-color 150ms var(--ease);
+}
+
+.primary-button:hover {
+  background: var(--accent-dark);
+}
+
+.offline-note {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--page);
+}
+
+.welcome .offline-note {
+  max-width: none;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  .model-menu {
+    width: 100%;
+    margin: 0 0 8px;
+  }
+
+  .model-button {
+    width: 100%;
+  }
+
+  .model-button svg {
+    margin-left: auto;
+  }
+
+  .model-panel {
+    right: auto;
+    left: 0;
+    width: 100%;
+  }
+}

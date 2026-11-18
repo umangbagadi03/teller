@@ -27,6 +27,11 @@
   box-sizing: border-box;
 }
 
+/* A hidden element stays hidden even when a class gives it a display value */
+[hidden] {
+  display: none !important;
+}
+
 html,
 body {
   margin: 0;

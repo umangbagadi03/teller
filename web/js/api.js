@@ -1,7 +1,11 @@
 async function readJson(response) {
   const data = await response.json();
   if (!response.ok) {
-    throw new Error(data.detail || "The request failed.");
+    let message = "The request failed";
+    if (data.detail) {
+      message = data.detail;
+    }
+    throw new Error(message);
   }
   return data;
 }
@@ -24,19 +28,35 @@ const PROVIDER_NAMES = {
   gemini: "Gemini",
   anthropic: "Anthropic",
   openai: "OpenAI",
-  ollama: "Ollama",
+  ollama_chat: "Ollama",
 };
 
+function formatModel(model) {
+  // "gemini/gemini-2.5-flash-lite" becomes "Gemini · gemini-2.5-flash-lite"
+  const slash = model.indexOf("/");
+  if (slash === -1) {
+    return model;
+  }
+
+  const provider = model.slice(0, slash);
+  const modelName = model.slice(slash + 1);
+  let providerName = provider;
+  if (PROVIDER_NAMES[provider]) {
+    providerName = PROVIDER_NAMES[provider];
+  }
+  return providerName + " · " + modelName;
+}
+
 async function showModelLine() {
+  // Only the Results page has this line. The Console has the model menu instead.
   const line = document.getElementById("model-line");
+  if (!line) {
+    return;
+  }
+
   try {
     const status = await getJson("/api/status");
-
-    // The model looks like "gemini/gemini-2.5-flash-lite". Keep what is after the first slash.
-    const slash = status.model.indexOf("/");
-    const modelName = status.model.slice(slash + 1);
-
-    line.textContent = PROVIDER_NAMES[status.provider] + " · " + modelName;
+    line.textContent = formatModel(status.label);
   } catch (error) {
     line.textContent = "Model not available";
   }

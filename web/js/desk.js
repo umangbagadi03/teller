@@ -28,6 +28,8 @@ const customerList = document.getElementById("customer-list");
 const currentAvatar = document.getElementById("current-avatar");
 const currentName = document.getElementById("current-name");
 const caseNumber = document.getElementById("case-number");
+const caseModel = document.getElementById("case-model");
+const offlineNote = document.getElementById("offline-note");
 const newCaseButton = document.getElementById("new-case-button");
 const messages = document.getElementById("messages");
 const welcome = document.getElementById("welcome");
@@ -256,12 +258,17 @@ function clearCaseView() {
 
 async function openNewCase() {
   clearCaseView();
+  currentCaseId = null;
   caseNumber.textContent = "opening";
 
+  // getModelRequest() comes from model.js: the server's model, offline, or the visitor's key
   try {
-    const newCase = await postJson("/api/cases", {});
+    const newCase = await postJson("/api/cases", getModelRequest());
     currentCaseId = newCase.id;
     caseNumber.textContent = newCase.id;
+    caseModel.textContent = formatModel(newCase.model);
+    showModelName(newCase.model);
+    offlineNote.hidden = !newCase.offline;
   } catch (error) {
     caseNumber.textContent = "not opened";
     formError.textContent = error.message;

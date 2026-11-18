@@ -6,8 +6,8 @@
   <title>Teller | Support console</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="css/base.css?v=2">
-  <link rel="stylesheet" href="css/desk.css?v=2">
+  <link rel="stylesheet" href="css/base.css?v=4">
+  <link rel="stylesheet" href="css/desk.css?v=4">
 </head>
 <body>
   <header class="topbar">
@@ -19,7 +19,66 @@
       <a class="nav-link nav-link-active" href="index.html">Console</a>
       <a class="nav-link" href="results.html">Results</a>
     </nav>
-    <p class="model-line" id="model-line">Checking model</p>
+    <div class="model-menu">
+      <button class="model-button" id="model-button" type="button" aria-expanded="false" aria-controls="model-panel">
+        <span class="model-button-label">Model</span>
+        <span id="model-name">Checking</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+
+      <div class="model-panel" id="model-panel" hidden>
+        <h2>Model for new cases</h2>
+        <div class="model-options">
+          <label class="model-option">
+            <input type="radio" name="model-source" value="server" checked>
+            <span>
+              <span class="model-option-title" id="server-title">Server model</span>
+              <span class="model-option-note" id="server-note"></span>
+            </span>
+          </label>
+          <label class="model-option" id="offline-option">
+            <input type="radio" name="model-source" value="offline">
+            <span>
+              <span class="model-option-title">Offline demo</span>
+              <span class="model-option-note">No key needed. A script plays the model.</span>
+            </span>
+          </label>
+          <label class="model-option">
+            <input type="radio" name="model-source" value="own">
+            <span>
+              <span class="model-option-title">Your own API key</span>
+              <span class="model-option-note">Gemini, Anthropic or OpenAI</span>
+            </span>
+          </label>
+        </div>
+
+        <div class="key-fields" id="key-fields" hidden>
+          <label class="field">
+            <span>Provider</span>
+            <select id="key-provider">
+              <option value="gemini">Gemini</option>
+              <option value="anthropic">Anthropic</option>
+              <option value="openai">OpenAI</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Model</span>
+            <input id="key-model" type="text" autocomplete="off" spellcheck="false">
+          </label>
+          <label class="field">
+            <span>API key</span>
+            <input id="key-value" type="password" autocomplete="off" spellcheck="false">
+          </label>
+          <p class="key-note">The key goes to this server with each message of the case. It is kept in memory for that case only and never saved or logged. This tab forgets it when you close it.</p>
+        </div>
+
+        <p class="model-error" id="model-error"></p>
+        <div class="model-actions">
+          <button class="secondary-button" id="model-cancel" type="button">Cancel</button>
+          <button class="primary-button" id="model-apply" type="button">Start a new case</button>
+        </div>
+      </div>
+    </div>
   </header>
 
   <main class="console">
@@ -37,7 +96,7 @@
         <span class="avatar avatar-large" id="current-avatar"></span>
         <div class="conversation-title">
           <h1 id="current-name">Loading</h1>
-          <p>Case <span id="case-number">not opened</span></p>
+          <p>Case <span id="case-number">not opened</span> · <span id="case-model">checking model</span></p>
         </div>
         <button class="secondary-button" id="new-case-button" type="button">New case</button>
       </div>
@@ -46,6 +105,7 @@
         <div class="welcome" id="welcome">
           <h2>Speak as the customer</h2>
           <p>Teller looks up the bank's policy, verifies you, and then makes the change itself. Each case gets its own copy of the sample database, so nothing here touches real money.</p>
+          <p class="offline-note" id="offline-note" hidden>Offline demo: a short script plays the language model, so only an email change runs end to end. Search, the checks in code and the bank tools are real.</p>
           <p class="suggestions-label">Try a request</p>
           <div class="suggestions" id="suggestions"></div>
         </div>
@@ -81,7 +141,8 @@
     </aside>
   </main>
 
-  <script src="js/api.js?v=2"></script>
-  <script src="js/desk.js?v=2"></script>
+  <script src="js/api.js?v=3"></script>
+  <script src="js/model.js?v=3"></script>
+  <script src="js/desk.js?v=3"></script>
 </body>
 </html>
