@@ -1,5 +1,6 @@
 # Deploys the web app on Render's free plan: https://render.com/deploy?repo=https://github.com/umangbagadi03/teller
-# The free plan has 512 MB of memory. Teller uses about 300 MB with full hybrid search.
+# The free plan has 512 MB of memory. Hybrid search with the reranker went over that on Render,
+# so the live demo searches with BM25 only. Run it locally for the full hybrid search.
 # No API key is set, so the site opens in the offline demo. Visitors can bring their own key.
 services:
   - type: web
@@ -8,3 +9,6 @@ services:
     plan: free
     dockerfilePath: ./Dockerfile
     healthCheckPath: /api/status
+    envVars:
+      - key: SEARCH_METHOD
+        value: bm25
