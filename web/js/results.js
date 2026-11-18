@@ -1,7 +1,18 @@
 const PIPELINE_ORDER = ["no_docs", "bm25", "teller_no_checks", "teller", "teller_golden", "golden"];
 
+// The same names as in teller/benchmark/pipelines.py, shown before a pipeline has a run
+const PIPELINE_LABELS = {
+  no_docs: "No documents",
+  bm25: "Plain RAG (BM25 tool)",
+  teller_no_checks: "Teller without checks",
+  teller: "Teller",
+  teller_golden: "Teller, correct documents given",
+  golden: "Benchmark agent, correct documents given",
+};
+
+const TELLER_SEARCH_METHOD = "Hybrid + reranker";
+
 const pipelineBars = document.getElementById("pipeline-bars");
-const pipelineEmpty = document.getElementById("pipeline-empty");
 const runRows = document.getElementById("run-rows");
 const runsEmpty = document.getElementById("runs-empty");
 const runDetail = document.getElementById("run-detail");
@@ -11,6 +22,7 @@ const retrievalBars = document.getElementById("retrieval-bars");
 const retrievalTable = document.getElementById("retrieval-table");
 const retrievalRows = document.getElementById("retrieval-rows");
 const retrievalEmpty = document.getElementById("retrieval-empty");
+const retrievalLegend = document.getElementById("retrieval-legend");
 
 function makeElement(tag, className, text) {
   const element = document.createElement(tag);
@@ -51,6 +63,7 @@ function formatTaskCount(count) {
 }
 
 function addBar(container, label, sublabel, value, tooltip) {
+  // Draws one row of a bar chart and returns it, so the caller can mark it
   const row = makeElement("div", "bar-row");
   row.title = tooltip;
 
@@ -66,6 +79,23 @@ function addBar(container, label, sublabel, value, tooltip) {
 
   row.append(labelBox, track, makeElement("div", "bar-value", formatPercent(value)));
   container.append(row);
+  return row;
+}
+
+function addEmptyBar(container, label) {
+  const row = makeElement("div", "bar-row bar-empty");
+  row.append(makeElement("div", "bar-label", label));
+  row.append(makeElement("div", "bar-track"));
+  row.append(makeElement("div", "bar-value", "Not run"));
+  container.append(row);
+  return row;
+}
+
+function addTick(row, value) {
+  // A thin mark on the track, used for the best possible score
+  const tick = makeElement("span", "bar-tick");
+  tick.style.left = (value * 100) + "%";
+  row.querySelector(".bar-track").append(tick);
 }
 
 function getLatestRuns(runs) {
@@ -99,16 +129,22 @@ function showTiles(latestRuns) {
 }
 
 function showPipelineBars(latestRuns) {
+  // Every pipeline gets a row, so the chart shows what is still missing
   for (const pipeline of PIPELINE_ORDER) {
     const run = latestRuns[pipeline];
-    if (!run) {
-      continue;
+
+    let row = null;
+    if (run) {
+      const sublabel = formatTaskCount(run.tasks_run) + ", " + run.split;
+      const tooltip = run.label + ": " + run.passed + " of " + formatTaskCount(run.tasks_run) + " passed on " + run.model;
+      row = addBar(pipelineBars, run.label, sublabel, run.success_rate, tooltip);
+    } else {
+      row = addEmptyBar(pipelineBars, PIPELINE_LABELS[pipeline]);
     }
 
-    pipelineEmpty.hidden = true;
-    const sublabel = formatTaskCount(run.tasks_run) + ", " + run.split;
-    const tooltip = run.label + ": " + run.passed + " of " + formatTaskCount(run.tasks_run) + " passed on " + run.model;
-    addBar(pipelineBars, run.label, sublabel, run.success_rate, tooltip);
+    if (pipeline === "teller") {
+      row.classList.add("bar-main");
+    }
   }
 }
 
@@ -164,13 +200,38 @@ async function showRun(runId) {
   runDetail.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
+function showRecallTile(report) {
+  for (const item of report.table) {
+    if (item.method !== TELLER_SEARCH_METHOD) {
+      continue;
+    }
+
+    document.getElementById("tile-recall").textContent = formatPercent(item.recall_at_10);
+    if (report.best_possible) {
+      const ceiling = formatPercent(report.best_possible.recall_at_10);
+      document.getElementById("tile-recall-note").textContent = "Out of " + ceiling + " possible with one search";
+    }
+  }
+}
+
 function showRetrieval(report) {
   retrievalEmpty.hidden = true;
   retrievalTable.hidden = false;
 
+  if (report.best_possible) {
+    retrievalLegend.hidden = false;
+  }
+
   for (const item of report.table) {
     const tooltip = item.method + ": recall at 10 on " + report.tasks + " tasks";
-    addBar(retrievalBars, item.method, "", item.recall_at_10, tooltip);
+    const bar = addBar(retrievalBars, item.method, "", item.recall_at_10, tooltip);
+
+    if (item.method === TELLER_SEARCH_METHOD) {
+      bar.classList.add("bar-main");
+    }
+    if (report.best_possible) {
+      addTick(bar, report.best_possible.recall_at_10);
+    }
 
     const row = makeElement("tr");
     addCell(row, item.method);
@@ -209,6 +270,7 @@ async function start() {
   }
 
   if (results.retrieval) {
+    showRecallTile(results.retrieval);
     showRetrieval(results.retrieval);
   }
 }
