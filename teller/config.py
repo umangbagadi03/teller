@@ -25,7 +25,9 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
 ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-haiku-5-5")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
+# Ollama is used only when it is asked for, so a server with no key runs offline instead
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "").strip()
+DEFAULT_OLLAMA_MODEL = "llama3.2"
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
 OLLAMA_CONTEXT_SIZE = int(os.getenv("OLLAMA_CONTEXT_SIZE", "16384"))
 
