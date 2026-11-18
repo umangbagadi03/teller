@@ -1,9 +1,11 @@
 const SUGGESTIONS = [
-  "I want the credit card with the most cash back. I earn $100,000 a year.",
-  "I need to change the email address on my account.",
-  "There is a charge on my credit card that I do not recognise.",
-  "Can I open another personal checking account?",
+  { topic: "Account change", text: "I need to change the email address on my account." },
+  { topic: "Cards", text: "I want the credit card with the most cash back. I earn $100,000 a year." },
+  { topic: "Dispute", text: "There is a charge on my credit card that I do not recognise." },
+  { topic: "Accounts", text: "Can I open another personal checking account?" },
 ];
+
+const VERIFICATION_TOOL = "log_verification";
 
 const PROFILE_FIELDS = [
   { key: "user_id", label: "Customer ID" },
@@ -27,6 +29,7 @@ const customerSearch = document.getElementById("customer-search");
 const customerList = document.getElementById("customer-list");
 const currentAvatar = document.getElementById("current-avatar");
 const currentName = document.getElementById("current-name");
+const verifyBadge = document.getElementById("verify-badge");
 const caseNumber = document.getElementById("case-number");
 const caseModel = document.getElementById("case-model");
 const offlineNote = document.getElementById("offline-note");
@@ -89,8 +92,12 @@ function showCustomerList() {
       button.classList.add("customer-active");
     }
 
+    const names = makeElement("span", "customer-text");
+    names.append(makeElement("span", "customer-name", customer.name));
+    names.append(makeElement("span", "customer-city", getCity(customer.address)));
+
     button.append(makeElement("span", "avatar", getInitials(customer.name)));
-    button.append(makeElement("span", "customer-name", customer.name));
+    button.append(names);
     button.addEventListener("click", function () {
       selectCustomer(customer);
     });
@@ -121,16 +128,47 @@ function selectCustomer(customer) {
 }
 
 function showSuggestions() {
-  for (const text of SUGGESTIONS) {
+  for (const suggestion of SUGGESTIONS) {
     const button = makeElement("button", "suggestion");
     button.type = "button";
-    button.append(makeElement("span", "", text));
+
+    const words = makeElement("span", "suggestion-words");
+    words.append(makeElement("span", "suggestion-topic", suggestion.topic));
+    words.append(makeElement("span", "", suggestion.text));
+    button.append(words);
     button.insertAdjacentHTML("beforeend", ICONS.arrow);
+
     button.addEventListener("click", function () {
-      messageInput.value = text;
+      messageInput.value = suggestion.text;
       messageInput.focus();
     });
     suggestions.append(button);
+  }
+}
+
+function getCity(address) {
+  // "14 MG Road, Bengaluru, Karnataka 560001" gives "Bengaluru"
+  const parts = address.split(", ");
+  if (parts.length < 2) {
+    return "";
+  }
+  return parts[1];
+}
+
+function getTime() {
+  // The time a message was sent, like "14:05"
+  const now = new Date();
+  return now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+function showVerified(isVerified) {
+  // The badge next to the customer's name follows the real verification tool
+  if (isVerified) {
+    verifyBadge.textContent = "Verified";
+    verifyBadge.classList.add("verify-done");
+  } else {
+    verifyBadge.textContent = "Not verified";
+    verifyBadge.classList.remove("verify-done");
   }
 }
 
@@ -138,7 +176,7 @@ function addMessage(author, text, className) {
   welcome.hidden = true;
 
   const message = makeElement("div", "message " + className);
-  message.append(makeElement("p", "message-author", author));
+  message.append(makeElement("p", "message-author", author + " · " + getTime()));
   message.append(makeElement("p", "message-text", text));
   messages.append(message);
   messages.scrollTop = messages.scrollHeight;
@@ -208,6 +246,10 @@ function addStep(step) {
 }
 
 function addAction(action) {
+  if (action.text === VERIFICATION_TOOL && !action.failed) {
+    showVerified(true);
+  }
+
   let iconName = "done";
   let label = "Bank action ran";
   if (action.failed) {
@@ -239,6 +281,8 @@ function showProfileTab() {
 }
 
 function clearCaseView() {
+  showVerified(false);
+
   const oldMessages = messages.querySelectorAll(".message");
   for (const message of oldMessages) {
     message.remove();

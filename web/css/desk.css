@@ -72,7 +72,7 @@
   align-items: center;
   gap: 8px;
   width: 100%;
-  height: 36px;
+  height: 44px;
   padding: 0 8px;
   border: 0;
   border-radius: 8px;
@@ -83,21 +83,34 @@
 }
 
 .customer-button:hover {
-  background: rgba(23, 23, 23, 0.04);
+  background: var(--hover);
   color: var(--text);
 }
 
 .customer-active,
 .customer-active:hover {
-  background: rgba(23, 23, 23, 0.06);
+  background: var(--active);
   color: var(--text);
   font-weight: 500;
+}
+
+.customer-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .customer-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.customer-city {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
 }
 
 .avatar {
@@ -146,11 +159,49 @@
 }
 
 .conversation-title h1 {
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
   font-size: 15px;
   font-weight: 500;
+}
+
+#current-name {
+  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Turns green only when the bank's verification tool really ran */
+.verify-badge {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  height: 20px;
+  padding: 0 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.verify-badge::before {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+  content: "";
+}
+
+.verify-done {
+  color: var(--positive);
+}
+
+.verify-done::before {
+  background: var(--positive);
 }
 
 .conversation-title p {
@@ -284,7 +335,7 @@
 .message-teller .message-text {
   border: 1px solid var(--line);
   background: var(--surface);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 2px var(--shadow);
 }
 
 .typing {
@@ -350,7 +401,7 @@
   border: 0;
   border-radius: 8px;
   background: var(--accent);
-  color: #ffffff;
+  color: var(--on-accent);
   font-weight: 500;
   transition: background-color 150ms var(--ease), transform 150ms var(--ease);
 }
@@ -635,7 +686,7 @@
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--surface);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 24px var(--shadow-float);
 }
 
 .model-panel h2 {
@@ -743,7 +794,7 @@
   border: 0;
   border-radius: 8px;
   background: var(--accent);
-  color: #ffffff;
+  color: var(--on-accent);
   font-size: 13px;
   font-weight: 500;
   transition: background-color 150ms var(--ease);
@@ -768,8 +819,13 @@
 }
 
 @media (max-width: 640px) {
+  /* The menu fills the second line and leaves room for the theme button */
   .model-menu {
-    width: 100%;
+    flex: 1 0 calc(100% - 52px);
+    margin: 0 0 8px;
+  }
+
+  .theme-button {
     margin: 0 0 8px;
   }
 
@@ -785,5 +841,87 @@
     right: auto;
     left: 0;
     width: 100%;
+  }
+}
+
+/* How a message moves through Teller, shown before the first message */
+
+.pipeline {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 24px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--page);
+}
+
+.pipeline li {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  align-content: start;
+  gap: 4px 8px;
+  padding: 16px;
+  border-left: 1px solid var(--line);
+}
+
+.pipeline li:first-child {
+  border-left: 0;
+}
+
+.pipeline-number {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.pipeline svg {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  color: var(--text-soft);
+}
+
+.pipeline-title {
+  font-weight: 500;
+}
+
+.pipeline-text {
+  grid-column: 1 / -1;
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+/* The check step is the one only Teller has, so it carries the accent */
+.pipeline li:nth-child(3) svg,
+.pipeline li:nth-child(3) .pipeline-title {
+  color: var(--accent-text);
+}
+
+.suggestion-words {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.suggestion-topic {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+@media (max-width: 720px) {
+  .pipeline {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .pipeline li:nth-child(3) {
+    border-left: 0;
+  }
+
+  .pipeline li:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
   }
 }
